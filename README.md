@@ -1,0 +1,1 @@
+# devicehive-plugin-python-template
