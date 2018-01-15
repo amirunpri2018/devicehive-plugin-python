@@ -6,37 +6,52 @@ import sys
 import websocket
 from six.moves import queue
 
-from devicehive_plugin.message import Message
+from devicehive_plugin.api_handler import ApiHandler
+from devicehive_plugin.error import TransportError
 
 
 class Transport(object):
 
     REQUEST_ID_KEY = 'id'
+    REQUEST_TYPE_KEY = 't'
     REQUEST_ACTION_KEY = 'a'
+    REQUEST_PAYLOAD_KEY = 'p'
     RESPONSE_SUCCESS_STATUS = 0
     RESPONSE_ERROR_STATUS = 1
     RESPONSE_STATUS_KEY = 's'
     RESPONSE_PAYLOAD_KEY = 'p'
     RESPONSE_ERROR_KEY = 'm'
 
-    def __init__(self, api_class, api_options, error_class):
+    def __init__(self, api_handler_options):
         self._connected = False
         self._websocket = websocket.WebSocket()
         self._response_sleep_time = None
+        self._exception_info = None
         self._event_queue = queue.Queue()
-        self._handler = api_class(self, **api_options)
+        self._api_handler = ApiHandler(self, **api_handler_options)
         self._responses = {}
-        self._error_class = error_class
 
+    @property
+    def exception_info(self):
+        return self._exception_info
+
+    @property
+    def api_handler(self):
+        return self._api_handler
+
+    @property
+    def connected(self):
+        return self._connected
+    
     def _ensure_not_connected(self):
         if not self._connected:
             return
-        raise self._error_class('Connection has already created.')
+        raise TransportError('Connection has already created.')
 
     def _ensure_connected(self):
         if self._connected:
             return
-        raise self._error_class('Connection has not created.')
+        raise TransportError('Connection has not created.')
 
     def _connection(self, url, options):
         try:
@@ -57,9 +72,6 @@ class Transport(object):
     def disconnect(self):
         self._ensure_connected()
         self._connected = False
-
-    # def send(self, data):
-    #     self._websocket.send(self._encode(data))
 
     def is_alive(self):
         return self._connection_thread.is_alive()
@@ -83,32 +95,31 @@ class Transport(object):
             ping_thread.name = 'transport-ping'
             ping_thread.daemon = True
             ping_thread.start()
+        self._handle_connect()
 
-        # auth_data = {
-        #     "t": "plugin",
-        #     "a": "authenticate",
-        #     "p": {"token": self._access_token}
-        # }
-        #
-        # self._websocket.send(self._encode(auth_data))
-        #
-        # self._receive()
+    def _handle_connect(self):
+        self._api_handler.handle_connect()
 
     def _handle_event(self, event):
-        self._handler.handle_event(event)
+        self._api_handler.handle_event(event)
+
+    def _handle_disconnect(self):
+        self._api_handler.handle_disconnect()
 
     def _receive(self):
         while self._connected:
             event = self._event_queue.get()
-            self._handle_event(event)
-            self._event_queue.task_done()
+            try:
+                self._handle_event(event)
+            finally:
+                self._event_queue.task_done()
 
     def _disconnect(self):
         self._websocket_call(self._websocket.close)
         self._pong_received = False
         self._event_queue = []
         self._responses = {}
-        # self._handle_disconnect()
+        self._handle_disconnect()
 
     def _encode(self, value):
         return json.dumps(value)
@@ -124,11 +135,9 @@ class Transport(object):
                 if opcode == websocket.ABNF.OPCODE_TEXT:
                     data = data.decode('utf-8')
                 event = self._decode(data)
-                message = Message(event)
                 request_id = event.get(self.REQUEST_ID_KEY)
                 if not request_id:
-                    self._event_queue.put(message)
-                    # self._event_queue.append(event)
+                    self._event_queue.put(event)
                     continue
                 self._responses[request_id] = event
                 continue
@@ -157,11 +166,13 @@ class Transport(object):
             return websocket_method(*args, **kwargs)
         except (websocket.WebSocketException, socket.error) as websocket_error:
             error = websocket_error
-        raise self._error_class(error)
+        raise TransportError(error)
 
-    def _request(self, request_id, action, request):
+    def _request(self, request_id, request_type, action, request, payload):
         request[self.REQUEST_ID_KEY] = request_id
+        request[self.REQUEST_TYPE_KEY] = request_type
         request[self.REQUEST_ACTION_KEY] = action
+        request[self.REQUEST_PAYLOAD_KEY] = payload
         self._websocket_call(self._websocket.send, self._encode(request))
 
     def _receive_response(self, request_id, timeout):
@@ -172,14 +183,14 @@ class Transport(object):
                 del self._responses[request_id]
                 return response
             time.sleep(self._response_sleep_time)
-        raise self._error_class('Response timeout.')
+        raise TransportError('Response timeout.')
 
-    def async_request(self, request_id, action, request, **params):
+    def async_request(self, request_id, request_type, action, request, payload):
         self._ensure_connected()
-        self._request(request_id, action, request)
+        self._request(request_id, request_type, action, request, payload)
 
-    def request(self, request_id, action, request, **params):
+    def request(self, request_id, request_type, action, request, payload,
+                timeout=30):
         self._ensure_connected()
-        timeout = params.pop('timeout', 30)
-        self._request(request_id, action, request)
+        self._request(request_id, request_type, action, request, payload)
         return self._receive_response(request_id, timeout)

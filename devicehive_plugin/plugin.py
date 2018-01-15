@@ -1,7 +1,8 @@
 import six
 import time
-from .transport import Transport
-from .api import Api
+
+from devicehive_plugin.error import TransportError
+from devicehive_plugin.transport import Transport
 
 
 class Plugin(object):
@@ -13,7 +14,7 @@ class Plugin(object):
 
     @property
     def handler(self):
-        return self._transport.handler.handler
+        return self._transport.api_handler.handler
 
     def _ensure_transport_disconnect(self):
         if self._transport.connected:
@@ -34,7 +35,7 @@ class Plugin(object):
         self._api_handler_options['credentials'] = credentials
         self._api_handler_options['topic_name'] = topic_name
         self._api_handler_options['api_init'] = api_init
-        self._transport = Transport(Api, self._api_handler_options)
+        self._transport = Transport(self._api_handler_options)
         if not transport_keep_alive:
             self._ensure_transport_disconnect()
             self._transport.connect(proxy_endpoint, **options)
@@ -48,7 +49,7 @@ class Plugin(object):
                 time.sleep(transport_alive_sleep_time)
             exception_info = self._transport.exception_info
             if exception_info and not isinstance(exception_info[1],
-                                                 self._transport.error):
+                                                 TransportError):
                 six.reraise(*exception_info)
             if not self.handler.api.connected:
                 return
