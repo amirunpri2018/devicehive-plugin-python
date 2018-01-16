@@ -2,6 +2,9 @@ from devicehive_plugin.api import Api
 from devicehive_plugin.message import Message
 
 
+__all__ = ['ApiHandler']
+
+
 class ApiHandler(object):
     def __init__(self, transport, credentials, topic_name, handler_class,
                  handler_args, handler_kwargs, api_init=True):

@@ -6,6 +6,7 @@ from devicehive_plugin.error import TransportError
 from devicehive_plugin.transport import Transport
 
 
+__all__ = ['Plugin']
 logger = logging.getLogger(__name__)
 
 

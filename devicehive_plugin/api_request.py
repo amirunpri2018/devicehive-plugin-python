@@ -4,6 +4,9 @@ from devicehive_plugin.api_response import ApiResponse
 from devicehive_plugin.error import ApiResponseError
 
 
+__all__ = ['BaseApiRequest', 'PluginRequest', 'TopicRequest']
+
+
 class BaseApiRequest(object):
     _type = None
 

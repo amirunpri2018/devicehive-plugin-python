@@ -1,7 +1,6 @@
 import logging
 
-from devicehive_plugin.handler import Handler
-from devicehive_plugin.plugin import Plugin
+from devicehive_plugin import Plugin, Handler
 
 
 handler = logging.StreamHandler()
@@ -11,9 +10,9 @@ logger.addHandler(handler)
 logger.setLevel('DEBUG')
 
 
-access_token = 'eyJhbGciOiJIUzI1NiJ9.eyJwYXlsb2FkIjp7ImEiOlswXSwiZSI6MjA4MzY3NDI1ODc4MiwidCI6MSwidHBjIjoicGx1Z2luX3RvcGljXzgxNTkwNGNmLWU1YzUtNGViYy04NjNkLTUyYjNmOTNmMGNmMCJ9fQ.52qdDOSDWfr-PiI68R-MZjCV1MIOOAaI0AXEThlRyoQ'
-url = 'ws://127.0.0.1:3000'
-topic = 'plugin_topic_815904cf-e5c5-4ebc-863d-52b3f93f0cf0'
+url = 'ws://playground-dev.devicehive.com/plugin/proxy/'
+topic = 'PLUGIN_TOPIC_NAME'
+access_token = 'PLUGIN_AUTH_TOKEN'
 
 
 class ExampleHandler(Handler):

@@ -1,6 +1,9 @@
 from devicehive_plugin.api_request import PluginRequest, TopicRequest
 
 
+__all__ = ['Api']
+
+
 class Api(object):
     def __init__(self, transport, access_token, topic_name):
         self._transport = transport

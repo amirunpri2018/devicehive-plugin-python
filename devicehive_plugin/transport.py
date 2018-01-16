@@ -11,6 +11,7 @@ from devicehive_plugin.api_handler import ApiHandler
 from devicehive_plugin.error import TransportError
 
 
+__all__ = ['Transport']
 logger = logging.getLogger(__name__)
 
 
