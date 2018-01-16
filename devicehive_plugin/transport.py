@@ -1,4 +1,5 @@
 import json
+import logging
 import socket
 import threading
 import time
@@ -8,6 +9,9 @@ from six.moves import queue
 
 from devicehive_plugin.api_handler import ApiHandler
 from devicehive_plugin.error import TransportError
+
+
+logger = logging.getLogger(__name__)
 
 
 class Transport(object):
@@ -77,6 +81,7 @@ class Transport(object):
         return self._connection_thread.is_alive()
 
     def _connect(self, url, **options):
+        logger.info('Connecting to %s', url)
         timeout = options.pop('timeout', None)
         response_sleep_time = options.pop('response_sleep_time', 1e-6)
         pong_timeout = options.pop('pong_timeout', None)
@@ -96,15 +101,7 @@ class Transport(object):
             ping_thread.daemon = True
             ping_thread.start()
         self._handle_connect()
-
-    def _handle_connect(self):
-        self._api_handler.handle_connect()
-
-    def _handle_event(self, event):
-        self._api_handler.handle_event(event)
-
-    def _handle_disconnect(self):
-        self._api_handler.handle_disconnect()
+        logger.info('Successfully connected')
 
     def _receive(self):
         while self._connected:
@@ -115,11 +112,22 @@ class Transport(object):
                 self._event_queue.task_done()
 
     def _disconnect(self):
+        logger.info('Disconnecting')
         self._websocket_call(self._websocket.close)
         self._pong_received = False
         self._event_queue = []
         self._responses = {}
         self._handle_disconnect()
+        logger.info('Successfully disconnected')
+
+    def _handle_connect(self):
+        self._api_handler.handle_connect()
+
+    def _handle_event(self, event):
+        self._api_handler.handle_event(event)
+
+    def _handle_disconnect(self):
+        self._api_handler.handle_disconnect()
 
     def _encode(self, value):
         return json.dumps(value)
@@ -134,6 +142,7 @@ class Transport(object):
                           websocket.ABNF.OPCODE_BINARY):
                 if opcode == websocket.ABNF.OPCODE_TEXT:
                     data = data.decode('utf-8')
+                logger.debug('Event: %s', data)
                 event = self._decode(data)
                 request_id = event.get(self.REQUEST_ID_KEY)
                 if not request_id:
@@ -173,7 +182,9 @@ class Transport(object):
         request[self.REQUEST_TYPE_KEY] = request_type
         request[self.REQUEST_ACTION_KEY] = action
         request[self.REQUEST_PAYLOAD_KEY] = payload
-        self._websocket_call(self._websocket.send, self._encode(request))
+        request = self._encode(request)
+        logger.debug('Request: %s', request)
+        self._websocket_call(self._websocket.send, request)
 
     def _receive_response(self, request_id, timeout):
         start_time = time.time()

@@ -1,8 +1,12 @@
 import six
 import time
+import logging
 
 from devicehive_plugin.error import TransportError
 from devicehive_plugin.transport import Transport
+
+
+logger = logging.getLogger(__name__)
 
 
 class Plugin(object):
@@ -48,9 +52,12 @@ class Plugin(object):
             while self._transport.is_alive():
                 time.sleep(transport_alive_sleep_time)
             exception_info = self._transport.exception_info
-            if exception_info and not isinstance(exception_info[1],
-                                                 TransportError):
-                six.reraise(*exception_info)
+            if exception_info:
+                if isinstance(exception_info[1], TransportError):
+                    logger.exception('An error has occurred:',
+                                     exc_info=exception_info)
+                else:
+                    six.reraise(*exception_info)
             if not self.handler.api.connected:
                 return
             if time.time() - connect_time < connect_timeout:
