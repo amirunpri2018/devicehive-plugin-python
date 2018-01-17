@@ -14,7 +14,6 @@
 # =============================================================================
 
 
-import json
 import logging
 import socket
 import threading
@@ -25,23 +24,22 @@ from six.moves import queue
 
 from devicehive_plugin.api_handler import ApiHandler
 from devicehive_plugin.error import TransportError
+from devicehive_plugin.message import ResponseMessage
 
 
 __all__ = ['Transport']
 logger = logging.getLogger(__name__)
 
 
-class Transport(object):
+def _websocket_call(websocket_method, *args, **kwargs):
+    try:
+        return websocket_method(*args, **kwargs)
+    except (websocket.WebSocketException, socket.error) as websocket_error:
+        error = websocket_error
+    raise TransportError(error)
 
-    REQUEST_ID_KEY = 'id'
-    REQUEST_TYPE_KEY = 't'
-    REQUEST_ACTION_KEY = 'a'
-    REQUEST_PAYLOAD_KEY = 'p'
-    RESPONSE_SUCCESS_STATUS = 0
-    RESPONSE_ERROR_STATUS = 1
-    RESPONSE_STATUS_KEY = 's'
-    RESPONSE_PAYLOAD_KEY = 'p'
-    RESPONSE_ERROR_KEY = 'm'
+
+class Transport(object):
 
     def __init__(self, api_handler_options):
         self._connected = False
@@ -104,7 +102,7 @@ class Transport(object):
         pong_timeout = options.pop('pong_timeout', None)
         self._websocket.timeout = timeout
         self._response_sleep_time = response_sleep_time
-        self._websocket_call(self._websocket.connect, url, **options)
+        _websocket_call(self._websocket.connect, url, **options)
         self._connected = True
         event_thread = threading.Thread(target=self._event)
         event_thread.name = 'transport-event'
@@ -130,7 +128,7 @@ class Transport(object):
 
     def _disconnect(self):
         logger.info('Disconnecting')
-        self._websocket_call(self._websocket.close)
+        _websocket_call(self._websocket.close)
         self._pong_received = False
         self._event_queue = []
         self._responses = {}
@@ -146,26 +144,19 @@ class Transport(object):
     def _handle_disconnect(self):
         self._api_handler.handle_disconnect()
 
-    def _encode(self, value):
-        return json.dumps(value)
-
-    def _decode(self, value):
-        return json.loads(value)
-
     def _event(self):
         while self._connected:
-            opcode, data = self._websocket_call(self._websocket.recv_data, True)
+            opcode, data = _websocket_call(self._websocket.recv_data, True)
             if opcode in (websocket.ABNF.OPCODE_TEXT,
                           websocket.ABNF.OPCODE_BINARY):
                 if opcode == websocket.ABNF.OPCODE_TEXT:
                     data = data.decode('utf-8')
                 logger.debug('Event: %s', data)
-                event = self._decode(data)
-                request_id = event.get(self.REQUEST_ID_KEY)
-                if not request_id:
-                    self._event_queue.put(event)
+                message = ResponseMessage(data)
+                if not message.id:
+                    self._event_queue.put(message)
                     continue
-                self._responses[request_id] = event
+                self._responses[message.id] = message
                 continue
 
             if opcode == websocket.ABNF.OPCODE_PONG:
@@ -177,7 +168,7 @@ class Transport(object):
     def _ping(self, pong_timeout):
         while self._connected:
             try:
-                self._websocket_call(self._websocket.ping)
+                _websocket_call(self._websocket.ping)
             except:
                 self._connected = False
                 return
@@ -187,21 +178,10 @@ class Transport(object):
                 self._connected = False
                 return
 
-    def _websocket_call(self, websocket_method, *args, **kwargs):
-        try:
-            return websocket_method(*args, **kwargs)
-        except (websocket.WebSocketException, socket.error) as websocket_error:
-            error = websocket_error
-        raise TransportError(error)
-
-    def _request(self, request_id, request_type, action, request, payload):
-        request[self.REQUEST_ID_KEY] = request_id
-        request[self.REQUEST_TYPE_KEY] = request_type
-        request[self.REQUEST_ACTION_KEY] = action
-        request[self.REQUEST_PAYLOAD_KEY] = payload
-        request = self._encode(request)
+    def _request(self, request):
+        request = request.encode()
         logger.debug('Request: %s', request)
-        self._websocket_call(self._websocket.send, request)
+        _websocket_call(self._websocket.send, request)
 
     def _receive_response(self, request_id, timeout):
         start_time = time.time()
@@ -213,12 +193,11 @@ class Transport(object):
             time.sleep(self._response_sleep_time)
         raise TransportError('Response timeout.')
 
-    def async_request(self, request_id, request_type, action, request, payload):
+    def async_request(self, request):
         self._ensure_connected()
-        self._request(request_id, request_type, action, request, payload)
+        self._request(request)
 
-    def request(self, request_id, request_type, action, request, payload,
-                timeout=30):
+    def request(self, request, timeout=30):
         self._ensure_connected()
-        self._request(request_id, request_type, action, request, payload)
-        return self._receive_response(request_id, timeout)
+        self._request(request)
+        return self._receive_response(request.id, timeout)

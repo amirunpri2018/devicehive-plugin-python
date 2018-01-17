@@ -14,16 +14,20 @@
 # =============================================================================
 
 
-class Handler(object):
-    def __init__(self, api):
-        self._api = api
+import json
+
+
+__all__ = ['Notification']
+
+
+class Notification(object):
+
+    CONTENT_KEY = 'b'
+
+    def __init__(self, notification):
+        notification = json.loads(notification)
+        self._content = notification[self.CONTENT_KEY]
 
     @property
-    def api(self):
-        return self._api
-
-    def handle_connect(self):
-        pass
-
-    def handle_notification(self, notification):
-        pass
+    def content(self):
+        return self._content

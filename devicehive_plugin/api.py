@@ -14,7 +14,7 @@
 # =============================================================================
 
 
-from devicehive_plugin.api_request import PluginRequest, TopicRequest
+from devicehive_plugin.message import RequestMessage
 
 
 __all__ = ['Api']
@@ -36,20 +36,20 @@ class Api(object):
         return self._transport
 
     def authenticate(self):
-        request = PluginRequest(self)
-        request.action('authenticate')
+        request = RequestMessage(self, RequestMessage.PLUGIN_TYPE,
+                                 RequestMessage.AUTHENTICATE_ACTION)
         request.set_payload('token', self._access_token)
         return request.execute()
 
     def subscribe(self):
-        request = TopicRequest(self)
-        request.action('subscribe')
+        request = RequestMessage(self, RequestMessage.TOPIC_TYPE,
+                                 RequestMessage.SUBSCRIBE_ACTION)
         request.set_payload('t', [self._topic_name])
         return request.execute()
 
     def unsubscribe(self):
-        request = TopicRequest(self)
-        request.action('unsubscribe')
+        request = RequestMessage(self, RequestMessage.TOPIC_TYPE,
+                                 RequestMessage.UNSUBSCRIBE_ACTION)
         request.set_payload('t', [self._topic_name])
         return request.execute()
 

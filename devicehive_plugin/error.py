@@ -18,5 +18,5 @@ class TransportError(IOError):
     pass
 
 
-class ApiResponseError(TransportError):
+class ResponseMessageError(TransportError):
     pass
