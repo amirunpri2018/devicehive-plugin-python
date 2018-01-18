@@ -141,6 +141,4 @@ class RequestMessage(BaseMessage):
 
         if response.is_success:
             return response
-
-        raise ResponseMessageError('ResponseMessageError: %s',
-                                   response.payload_message)
+        raise ResponseMessageError(response.payload_message)
