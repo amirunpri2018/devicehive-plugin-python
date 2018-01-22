@@ -14,8 +14,19 @@
 # =============================================================================
 
 
-from .plugin import Plugin
-from .handler import Handler
+import six
 
 
-__version__ = "0.0.1"
+def test_create_plugin(test):
+    plugin_api = test.plugin_api()
+    name = test.generate_id('c-p')
+    description = '%s-description' % name
+    response = plugin_api.create_plugin(name, description)
+
+    topic_name = response['topicName']
+
+    assert isinstance(topic_name, six.string_types)
+
+    print(response)
+
+    plugin_api.remove_plugin(topic_name)

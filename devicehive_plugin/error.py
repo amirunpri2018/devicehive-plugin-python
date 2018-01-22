@@ -15,8 +15,23 @@
 
 
 class TransportError(IOError):
+    """TransportError error."""
     pass
 
 
 class ResponseMessageError(TransportError):
+    """ResponseMessageError error."""
     pass
+
+
+class TokenError(TransportError):
+    """PluginTokenError error."""
+
+
+class AuthApiError(TokenError):
+    """PluginTokenError error."""
+
+    def __init__(self, code, message):
+        self.code = code
+        message = 'Code: %s Message %s' % (code, message)
+        super(AuthApiError, self).__init__(message)

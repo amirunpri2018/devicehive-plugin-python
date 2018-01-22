@@ -15,15 +15,15 @@
 
 
 from devicehive_plugin.message import RequestMessage
-
+from devicehive_plugin.token import Token
 
 __all__ = ['Api']
 
 
 class Api(object):
-    def __init__(self, transport, access_token, topic_name):
+    def __init__(self, transport, credentials, topic_name):
         self._transport = transport
-        self._access_token = access_token
+        self._token = Token(self, credentials, topic_name)
         self._topic_name = topic_name
         self._connected = True
 
@@ -36,10 +36,7 @@ class Api(object):
         return self._transport
 
     def authenticate(self):
-        request = RequestMessage(self, RequestMessage.PLUGIN_TYPE,
-                                 RequestMessage.AUTHENTICATE_ACTION)
-        request.set_payload('token', self._access_token)
-        return request.execute()
+        self._token.auth()
 
     def subscribe(self):
         request = RequestMessage(self, RequestMessage.TOPIC_TYPE,

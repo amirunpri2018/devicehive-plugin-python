@@ -26,10 +26,7 @@ class ApiHandler(object):
     def __init__(self, transport, credentials, topic_name, handler_class,
                  handler_args, handler_kwargs, api_init=True):
         self._transport = transport
-        # TODO: add logic to renew access_token
-        self._credentials = credentials
-        access_token = self._credentials.pop('access_token')
-        self._api = Api(self._transport, access_token, topic_name)
+        self._api = Api(self._transport, credentials, topic_name)
         self._handler = handler_class(self._api, *handler_args,
                                       **handler_kwargs)
         self._api_init = api_init
@@ -47,8 +44,8 @@ class ApiHandler(object):
             raise ResponseMessageError('An unsupported event received')
 
     def handle_connect(self):
+        self._api.authenticate()
         if self._api_init:
-            self._api.authenticate()
             self._api.subscribe()
 
         if not self._handle_connect:
