@@ -31,16 +31,19 @@ class Token(object):
         self._topic_name = topic_name
         self._login = credentials.get('login')
         self._password = credentials.get('password')
+        self._refresh_token = credentials.get('refresh_token')
+        self._access_token = credentials.get('access_token')
         self._plugin_refresh_token = credentials.get('plugin_refresh_token')
         self._plugin_access_token = credentials.get('plugin_access_token')
-        self._user_refresh_token = credentials.get('user_refresh_token')
-        self._user_access_token = credentials.get('user_refresh_token')
-        self._auth_url = credentials.get('auth_url')
+        auth_url = credentials.get('auth_url')
+        if auth_url and not auth_url.endswith('/'):
+            auth_url += '/'
+        self._auth_url = auth_url
 
     @property
     def _auth_header(self):
         auth_header_name = self.AUTH_HEADER_NAME
-        auth_header_value = self.AUTH_HEADER_PREFIX + self._plugin_access_token
+        auth_header_value = self.AUTH_HEADER_PREFIX + self._access_token
         return {auth_header_name: auth_header_value}
 
     def _request(self, method, url, params=None, data=None, headers=None):
@@ -64,7 +67,7 @@ class Token(object):
             if auth_api_error.code != 401:
                 raise
 
-        if self._user_refresh_token:
+        if self._refresh_token:
             self._refresh_user_token()
         elif self._login and self._password:
             self._get_user_tokens()
@@ -85,23 +88,23 @@ class Token(object):
             'password': self._password,
         }
         tokens = self._request(method, url, data=data)
-        self._user_refresh_token = tokens['refreshToken']
-        self._user_access_token = tokens['accessToken']
+        self._refresh_token = tokens['refreshToken']
+        self._access_token = tokens['accessToken']
 
     def _get_plugin_tokens(self, expiration=None):
         method = 'POST'
-        url = 'auth/rest/token/plugin/create'
+        url = 'token/plugin/create'
         if expiration is None:
             expiration = datetime.datetime.utcnow() + datetime.timedelta(1)
         # The only way to get proper format with all supported python versions.
-        expiration = '%s.%d.3Z' % (expiration.strftime('%Y-%m-%dT%H:%M:%S'),
+        expiration = '%s.%.3dZ' % (expiration.strftime('%Y-%m-%dT%H:%M:%S'),
                                    expiration.microsecond//1000)
-        data = {'payload': {
+        data = {
             'a': [0],
             'e': expiration,
             't': 0,
             'tpc': self._topic_name
-        }}
+        }
         tokens = self._auth_request(method, url, data=data)
         self._plugin_refresh_token = tokens['refreshToken']
         self._plugin_access_token = tokens['accessToken']
@@ -116,7 +119,7 @@ class Token(object):
         return tokens['accessToken']
 
     def _refresh_user_token(self):
-        self._user_access_token = self._refresh(self._user_refresh_token)
+        self._access_token = self._refresh(self._refresh_token)
 
     def _refresh_plugin_token(self):
         self._plugin_access_token = self._refresh(self._plugin_refresh_token)
@@ -129,10 +132,10 @@ class Token(object):
         elif self._plugin_refresh_token:
             self._refresh_plugin_token()
             self._auth()
-        elif self._user_access_token:
+        elif self._access_token:
             self._get_plugin_tokens()
             self._auth()
-        elif self._user_refresh_token:
+        elif self._refresh_token:
             self._refresh_user_token()
             self._get_plugin_tokens()
             self._auth()

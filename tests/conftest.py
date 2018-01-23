@@ -54,7 +54,6 @@ def pytest_generate_tests(metafunc):
             role_credentials[role] = {'access_token': access_token}
         elif login and password:
             role_credentials[role] = {'login': login, 'password': password}
-            continue
 
     log_level = options.log_level or 'INFO'
 

@@ -65,9 +65,6 @@ class Test(object):
 
     def __init__(self, transport_url, user_role, credentials):
         self._transport_url = transport_url
-        parts = url_parse.urlsplit(self._transport_url)
-        parts = (parts.scheme, parts.netloc, '', None, None)
-        self._base_url = url_parse.urlunsplit(parts)
         self._user_role = user_role
         self._credentials = credentials
         self._transport_name = DeviceHive.transport_name(self._transport_url)
@@ -133,9 +130,10 @@ class Test(object):
         return DeviceHiveApi(self._transport_url, **self._credentials)
 
     def plugin_api(self):
-        return PluginApi(self._base_url, **self._credentials)
+        return PluginApi(self._transport_url, **self._credentials)
 
-    def run(self, handle_connect, handle_notification=None, handle_timeout=60):
+    def run(self, proxy_endpoint, topic_name, handle_connect,
+            handle_notification=None, handle_timeout=60):
         handler_kwargs = {'handle_connect': handle_connect,
                           'handle_notification': handle_notification}
         plugin = Plugin(TestHandler, **handler_kwargs)
@@ -143,7 +141,8 @@ class Test(object):
                                         args=(plugin,))
         timeout_timer.setDaemon(True)
         timeout_timer.start()
-        plugin.connect(self._transport_url, **self._credentials)
+        credentials = dict(self._credentials, auth_url=self._transport_url)
+        plugin.connect(proxy_endpoint, topic_name, **credentials)
         timeout_timer.cancel()
 
         if self._is_handle_timeout:

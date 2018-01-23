@@ -53,4 +53,4 @@ class ApiHandler(object):
             self._handler.handle_connect()
 
     def handle_disconnect(self):
-        self._handler.handle_disconnect()
+        pass

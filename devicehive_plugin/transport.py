@@ -96,7 +96,7 @@ class Transport(object):
         return self._connection_thread.is_alive()
 
     def _connect(self, url, **options):
-        logger.info('Connecting to %s', url)
+        logger.debug('Connecting to %s', url)
         timeout = options.pop('timeout', None)
         response_sleep_time = options.pop('response_sleep_time', 1e-6)
         pong_timeout = options.pop('pong_timeout', None)
@@ -116,7 +116,7 @@ class Transport(object):
             ping_thread.daemon = True
             ping_thread.start()
         self._handle_connect()
-        logger.info('Successfully connected')
+        logger.debug('Successfully connected')
 
     def _receive(self):
         while self._connected:
@@ -127,13 +127,13 @@ class Transport(object):
                 self._event_queue.task_done()
 
     def _disconnect(self):
-        logger.info('Disconnecting')
+        logger.debug('Disconnecting')
         _websocket_call(self._websocket.close)
         self._pong_received = False
         self._event_queue = []
         self._responses = {}
         self._handle_disconnect()
-        logger.info('Successfully disconnected')
+        logger.debug('Successfully disconnected')
 
     def _handle_connect(self):
         self._api_handler.handle_connect()

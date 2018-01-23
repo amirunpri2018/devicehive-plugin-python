@@ -26,13 +26,12 @@ class PluginApi(object):
     Simple wrapper to communicate with API thought REST
     """
 
-    PLUGIN_MANAGEMENT_URL = 'plugin/rest/'
     SUCCESS_CODES = [200, 201, 204]
 
     def __init__(self, url, **credentials):
         if not url.endswith('/'):
             url += '/'
-        self._url = url + self.PLUGIN_MANAGEMENT_URL
+        self._url = url
         self._token = Token(self, credentials)
 
     def request(self, method, url, params=None, data=None, headers=None):
