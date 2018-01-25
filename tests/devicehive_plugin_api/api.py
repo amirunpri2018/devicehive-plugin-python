@@ -18,6 +18,7 @@ import requests
 
 from tests.devicehive_plugin_api.token import Token
 
+
 __all__ = ['PluginApi']
 
 

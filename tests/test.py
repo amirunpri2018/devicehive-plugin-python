@@ -19,8 +19,7 @@ import pytest
 import time
 import six
 from devicehive import DeviceHive, DeviceHiveApi
-from six.moves import range as six_range
-from six.moves.urllib import parse as url_parse
+from six.moves import range
 from collections import defaultdict
 
 from devicehive_plugin import Handler, Plugin
@@ -34,11 +33,11 @@ if six.PY2:
 class TestHandler(Handler):
     """Test handler class."""
 
-    def __init__(self, api, handle_connect, handle_notification):
+    def __init__(self, api, handle_connect, handle_notification, data):
         super(TestHandler, self).__init__(api)
         self._handle_connect = handle_connect
         self._handle_notification = handle_notification
-        self.data = {}
+        self.data = data if data is not None else {}
 
     def handle_connect(self):
         self._handle_connect(self)
@@ -62,6 +61,7 @@ class Test(object):
     DEVICE_ENTITY = 'device'
     NETWORK_ENTITY = 'network'
     DEVICE_TYPE_ENTITY = 'device_type'
+    PLUGIN_ENTITY = 'plugin'
 
     def __init__(self, transport_url, user_role, credentials):
         self._transport_url = transport_url
@@ -72,6 +72,46 @@ class Test(object):
         self._is_handle_timeout = False
 
         assert self.http_transport, 'Plugin API available only by HTTP'
+
+    def _cleanup_user(self, _id):
+        api = self.device_hive_api()
+        for obj in api.list_users(login=_id):
+            obj.remove()
+
+    def _cleanup_device(self, _id):
+        api = self.device_hive_api()
+        api.get_device(_id).remove()
+
+    def _cleanup_network(self, _id):
+        api = self.device_hive_api()
+        for obj in api.list_networks(name=_id):
+            obj.remove()
+
+    def _cleanup_device_type(self, _id):
+        api = self.device_hive_api()
+        for obj in api.list_device_types(name=_id):
+            obj.remove()
+
+    def _cleanup_plugin(self, _id):
+        # TODO: uncomment after "plugin/delete" will be fixed and "plugin/list"
+        # will be added
+        # api = self.plugin_api()
+        # for obj in api.list_plugins(name=_id):
+        #     topic_name = obj['topicName']
+        #     api.remove_plugin(topic_name)
+        pass
+
+    def cleanup(self):
+        for entity_type, entity_ids in six.iteritems(self.entity_ids):
+            if entity_type is None:
+                continue
+
+            attr_name = '_clean_%s' % entity_type
+            for _id in entity_ids:
+                try:
+                    getattr(self, attr_name)(_id)
+                except:
+                    pass
 
     def _generate_id(self, key=None):
         time_key = repr(time.time()).replace('.', '')
@@ -88,7 +128,7 @@ class Test(object):
 
     def generate_ids(self, key=None, entity_type=None, count=1):
         base_entity_id = self._generate_id(key=key)
-        entity_ids = ['%s-%s' % (base_entity_id, i) for i in six_range(count)]
+        entity_ids = ['%s-%s' % (base_entity_id, i) for i in range(count)]
         self._entity_ids[entity_type].extend(entity_ids)
         return base_entity_id, entity_ids
 
@@ -133,9 +173,10 @@ class Test(object):
         return PluginApi(self._transport_url, **self._credentials)
 
     def run(self, proxy_endpoint, topic_name, handle_connect,
-            handle_notification=None, handle_timeout=60):
+            handle_notification=None, data=None, handle_timeout=60):
         handler_kwargs = {'handle_connect': handle_connect,
-                          'handle_notification': handle_notification}
+                          'handle_notification': handle_notification,
+                          'data': data}
         plugin = Plugin(TestHandler, **handler_kwargs)
         timeout_timer = threading.Timer(handle_timeout, self._on_handle_timeout,
                                         args=(plugin,))
