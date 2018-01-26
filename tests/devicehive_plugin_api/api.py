@@ -20,7 +20,7 @@ import requests
 from tests.devicehive_plugin_api.token import Token
 
 
-__all__ = ['PluginApi']
+__all__ = ['PluginApi', 'PluginApiError']
 logger = logging.getLogger(__name__)
 
 
@@ -67,7 +67,7 @@ class PluginApi(object):
         return self.request(method, url, params, data, headers)
 
     def create_plugin(self, name, description, parameters=None, device_id=None,
-                      device_types_ids=(), network_ids=(), names=(),
+                      device_type_ids=(), network_ids=(), names=(),
                       subscribe_insert_commands=True,
                       subscribe_update_commands=False,
                       subscribe_notifications=False):
@@ -78,7 +78,7 @@ class PluginApi(object):
         url = 'plugin'
         params = {
             'deviceId': device_id,
-            'deviceTypeIds': device_types_ids,
+            'deviceTypeIds': device_type_ids,
             'networkIds': network_ids,
             'names': names,
             'returnCommands': subscribe_insert_commands,
@@ -92,41 +92,68 @@ class PluginApi(object):
         }
         return self.auth_request(method, url, params, data)
 
-    def update_plugin(self, topic, name=None, description=None, parameters=None,
-                      device_id=None, device_types_ids=(), network_ids=(),
-                      names=(), subscribe_insert_commands=True,
-                      subscribe_update_commands=False,
-                      subscribe_notifications=False):
+    def update_plugin(self, topic_name, name=None, description=None,
+                      parameters=None, device_id=None, device_type_ids=None,
+                      network_ids=None, names=None,
+                      subscribe_insert_commands=None,
+                      subscribe_update_commands=None,
+                      subscribe_notifications=None):
 
-        parameters = parameters if parameters is not None else {}
+        # parameters = parameters if parameters is not None else {}
 
         method = 'PUT'
         url = 'plugin'
         params = {
-            'topicName': topic,
-            'deviceId': device_id,
-            'deviceTypeIds': device_types_ids,
-            'networkIds': network_ids,
-            'names': names,
-            'returnCommands': subscribe_insert_commands,
-            'returnUpdatedCommands': subscribe_update_commands,
-            'returnNotifications': subscribe_notifications,
-            'name': name,
-            'description': description,
-            'parameters': parameters
+            'topicName': topic_name,
         }
+        if name is not None:
+            params['name'] = name
+        if description is not None:
+            params['description'] = description
+        if parameters is not None:
+            params['parameters'] = parameters
+        if device_id is not None:
+            params['deviceId'] = device_id
+        if device_type_ids is not None:
+            params['deviceTypeIds'] = device_type_ids
+        if network_ids is not None:
+            params['networkIds'] = network_ids
+        if names is not None:
+            params['names'] = names
+        if subscribe_insert_commands is not None:
+            params['returnCommands'] = subscribe_insert_commands
+        if subscribe_update_commands is not None:
+            params['returnUpdatedCommands'] = subscribe_update_commands
+        if subscribe_notifications is not None:
+            params['returnNotifications'] = subscribe_notifications
+
         return self.auth_request(method, url, params)
 
-    def remove_plugin(self, topic):
+    def remove_plugin(self, topic_name):
         method = 'DELETE'
         url = 'plugin'
         params = {
-            'topicName': topic
+            'topicName': topic_name
         }
         return self.auth_request(method, url, params)
 
-    def list_plugins(self):
-        raise NotImplementedError
+    def list_plugins(self, name=None, name_pattern=None, topic_name=None,
+                     status=None, user_id=None, sort_field=None,
+                     sort_order=None, take=None, skip=None):
+        method = 'GET'
+        url = 'plugin'
+        params = {
+            'name': name,
+            'namePattern': name_pattern,
+            'topicName': topic_name,
+            'status': status,
+            'userId': user_id,
+            'sortField': sort_field,
+            'sortOrder': sort_order,
+            'take': take,
+            'skip': skip
+        }
+        return self.auth_request(method, url, params)
     
 
 class PluginApiError(IOError):

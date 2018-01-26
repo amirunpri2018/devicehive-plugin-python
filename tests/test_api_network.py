@@ -60,9 +60,9 @@ def test_subscribe_insert_commands(test):
     data = init_data()
     name = test.generate_id('n-s-i-c', test.PLUGIN_ENTITY)
     description = '%s-description' % name
-    response = plugin_api.create_plugin(name, description,
-                                        network_ids=[data['network'].id])
-    topic_name = response['topicName']
+    plugin = plugin_api.create_plugin(name, description,
+                                      network_ids=[data['network'].id])
+    topic_name = plugin['topicName']
     test.run(proxy_endpoint, topic_name, handle_connect, handle_notification,
              data)
     # TODO: uncomment after "plugin/delete" will be fixed
@@ -86,10 +86,10 @@ def test_subscribe_insert_commands(test):
     data = init_data()
     name = test.generate_id('n-s-i-c', test.PLUGIN_ENTITY)
     description = '%s-description' % name
-    response = plugin_api.create_plugin(name, description,
-                                        network_ids=[data['network'].id],
-                                        names=data['command_names'][:1])
-    topic_name = response['topicName']
+    plugin = plugin_api.create_plugin(name, description,
+                                      network_ids=[data['network'].id],
+                                      names=data['command_names'][:1])
+    topic_name = plugin['topicName']
     test.run(proxy_endpoint, topic_name, handle_connect, handle_notification,
              data)
     # TODO: uncomment after "plugin/delete" will be fixed
@@ -143,11 +143,11 @@ def test_subscribe_update_commands(test):
     data = init_data()
     name = test.generate_id('n-s-u-c', test.PLUGIN_ENTITY)
     description = '%s-description' % name
-    response = plugin_api.create_plugin(name, description,
-                                        network_ids=[data['network'].id],
-                                        subscribe_insert_commands=False,
-                                        subscribe_update_commands=True)
-    topic_name = response['topicName']
+    plugin = plugin_api.create_plugin(name, description,
+                                      network_ids=[data['network'].id],
+                                      subscribe_insert_commands=False,
+                                      subscribe_update_commands=True)
+    topic_name = plugin['topicName']
     test.run(proxy_endpoint, topic_name, handle_connect, handle_notification,
              data)
     # TODO: uncomment after "plugin/delete" will be fixed
@@ -172,12 +172,12 @@ def test_subscribe_update_commands(test):
     data = init_data()
     name = test.generate_id('n-s-u-c', test.PLUGIN_ENTITY)
     description = '%s-description' % name
-    response = plugin_api.create_plugin(name, description,
-                                        network_ids=[data['network'].id],
-                                        names=data['command_names'][:1],
-                                        subscribe_insert_commands=False,
-                                        subscribe_update_commands=True)
-    topic_name = response['topicName']
+    plugin = plugin_api.create_plugin(name, description,
+                                      network_ids=[data['network'].id],
+                                      names=data['command_names'][:1],
+                                      subscribe_insert_commands=False,
+                                      subscribe_update_commands=True)
+    topic_name = plugin['topicName']
     test.run(proxy_endpoint, topic_name, handle_connect, handle_notification,
              data)
     # TODO: uncomment after "plugin/delete" will be fixed
@@ -224,9 +224,9 @@ def test_subscribe_notifications(test):
     data = init_data()
     name = test.generate_id('n-s-n', test.PLUGIN_ENTITY)
     description = '%s-description' % name
-    response = plugin_api.create_plugin(name, description,
-                                        network_ids=[data['network'].id])
-    topic_name = response['topicName']
+    plugin = plugin_api.create_plugin(name, description,
+                                      network_ids=[data['network'].id])
+    topic_name = plugin['topicName']
     test.run(proxy_endpoint, topic_name, handle_connect, handle_notification,
              data)
     # TODO: uncomment after "plugin/delete" will be fixed
@@ -250,10 +250,10 @@ def test_subscribe_notifications(test):
     data = init_data()
     name = test.generate_id('n-s-n', test.PLUGIN_ENTITY)
     description = '%s-description' % name
-    response = plugin_api.create_plugin(name, description,
-                                        network_ids=[data['network'].id],
-                                        names=data['notification_names'][:1])
-    topic_name = response['topicName']
+    plugin = plugin_api.create_plugin(name, description,
+                                      network_ids=[data['network'].id],
+                                      names=data['notification_names'][:1])
+    topic_name = plugin['topicName']
     test.run(proxy_endpoint, topic_name, handle_connect, handle_notification,
              data)
     # TODO: uncomment after "plugin/delete" will be fixed
