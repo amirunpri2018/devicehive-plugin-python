@@ -14,12 +14,14 @@
 # =============================================================================
 
 
+import logging
 import requests
 
 from tests.devicehive_plugin_api.token import Token
 
 
 __all__ = ['PluginApi']
+logger = logging.getLogger(__name__)
 
 
 class PluginApi(object):
@@ -37,9 +39,13 @@ class PluginApi(object):
 
     def request(self, method, url, params=None, data=None, headers=None):
         url = self._url + url
+        logger.debug('Request: method=%s url=%s params=%s data=%s',
+                     method, url, params, data)
         response = requests.request(method, url, params=params, json=data,
                                     headers=headers)
         content = response.json()
+        logger.debug('Response: code=%s content=%s', response.status_code,
+                     response.content)
         if response.status_code in self.SUCCESS_CODES:
             return content
 
