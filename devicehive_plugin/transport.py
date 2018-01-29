@@ -130,7 +130,6 @@ class Transport(object):
         logger.debug('Disconnecting')
         _websocket_call(self._websocket.close)
         self._pong_received = False
-        self._event_queue = []
         self._responses = {}
         self._handle_disconnect()
         logger.debug('Successfully disconnected')

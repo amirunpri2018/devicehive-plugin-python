@@ -14,21 +14,31 @@
 # =============================================================================
 
 
-class Notification(object):
-    """Notification class."""
+class Command(object):
+    """Command class."""
 
     DEVICE_ID_KEY = 'deviceId'
     ID_KEY = 'id'
-    NOTIFICATION_KEY = 'notification'
+    USER_ID_KEY = 'userId'
+    COMMAND_KEY = 'command'
     PARAMETERS_KEY = 'parameters'
+    LIFETIME_KEY = 'lifetime'
     TIMESTAMP_KEY = 'timestamp'
+    LAST_UPDATED_KEY = 'lastUpdated'
+    STATUS_KEY = 'status'
+    RESULT_KEY = 'result'
 
-    def __init__(self, notification):
-        self._device_id = notification[self.DEVICE_ID_KEY]
-        self._id = notification[self.ID_KEY]
-        self._notification = notification[self.NOTIFICATION_KEY]
-        self._parameters = notification[self.PARAMETERS_KEY]
-        self._timestamp = notification[self.TIMESTAMP_KEY]
+    def __init__(self, command):
+        self._device_id = command[self.DEVICE_ID_KEY]
+        self._id = command[self.ID_KEY]
+        self._user_id = command[self.USER_ID_KEY]
+        self._command = command[self.COMMAND_KEY]
+        self._parameters = command[self.PARAMETERS_KEY]
+        self._lifetime = command[self.LIFETIME_KEY]
+        self._timestamp = command[self.TIMESTAMP_KEY]
+        self._last_updated = command[self.LAST_UPDATED_KEY]
+        self.status = command[self.STATUS_KEY]
+        self.result = command[self.RESULT_KEY]
 
     @property
     def device_id(self):
@@ -39,13 +49,24 @@ class Notification(object):
         return self._id
 
     @property
-    def notification(self):
-        return self._notification
+    def user_id(self):
+        return self._user_id
+
+    @property
+    def command(self):
+        return self._command
 
     @property
     def parameters(self):
         return self._parameters
 
     @property
+    def lifetime(self):
+        return self._lifetime
+
+    @property
     def timestamp(self):
         return self._timestamp
+
+    def last_updated(self):
+        return self._last_updated

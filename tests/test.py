@@ -33,9 +33,13 @@ if six.PY2:
 class TestHandler(Handler):
     """Test handler class."""
 
-    def __init__(self, api, handle_connect, handle_notification, data):
+    def __init__(self, api, handle_connect, handle_event, handle_command_insert,
+                 handle_command_update, handle_notification, data):
         super(TestHandler, self).__init__(api)
         self._handle_connect = handle_connect
+        self._handle_event = handle_event
+        self._handle_command_insert = handle_command_insert
+        self._handle_command_update = handle_command_update
         self._handle_notification = handle_notification
         self.data = data if data is not None else {}
 
@@ -44,13 +48,25 @@ class TestHandler(Handler):
         if not self._handle_notification:
             self.disconnect()
 
+    def handle_event(self, event):
+        if not self._handle_event:
+            return
+        self._handle_event(self, event)
+
+    def handle_command_insert(self, command):
+        if not self._handle_command_insert:
+            return
+        self._handle_command_insert(self, command)
+
+    def _handle_command_update(self, command):
+        if not self._handle_command_update:
+            return
+        self._handle_command_update(self, command)
+
     def handle_notification(self, notification):
         if not self._handle_notification:
             return
         self._handle_notification(self, notification)
-
-    def disconnect(self):
-        self.api.disconnect()
 
 
 class Test(object):
@@ -93,13 +109,10 @@ class Test(object):
             obj.remove()
 
     def _cleanup_plugin(self, _id):
-        # TODO: uncomment after "plugin/delete" will be fixed and "plugin/list"
-        # will be added
-        # api = self.plugin_api()
-        # for obj in api.list_plugins(name=_id):
-        #     topic_name = obj['topicName']
-        #     api.remove_plugin(topic_name)
-        pass
+        api = self.plugin_api()
+        for obj in api.list_plugins(name=_id):
+            topic_name = obj['topicName']
+            api.remove_plugin(topic_name)
 
     def cleanup(self):
         for entity_type, entity_ids in six.iteritems(self.entity_ids):
@@ -173,8 +186,13 @@ class Test(object):
         return PluginApi(self._transport_url, **self._credentials)
 
     def run(self, proxy_endpoint, topic_name, handle_connect,
-            handle_notification=None, data=None, handle_timeout=60):
+            handle_event=None, handle_command_insert=None,
+            handle_command_update=None, handle_notification=None, data=None,
+            handle_timeout=60):
         handler_kwargs = {'handle_connect': handle_connect,
+                          'handle_event': handle_event,
+                          'handle_command_insert': handle_command_insert,
+                          'handle_command_update': handle_command_update,
                           'handle_notification': handle_notification,
                           'data': data}
         plugin = Plugin(TestHandler, **handler_kwargs)

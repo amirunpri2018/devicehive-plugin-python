@@ -15,6 +15,7 @@
 
 
 class Handler(object):
+
     def __init__(self, api):
         self._api = api
 
@@ -22,7 +23,19 @@ class Handler(object):
     def api(self):
         return self._api
 
+    def disconnect(self):
+        self._api.disconnect()
+
     def handle_connect(self):
+        pass
+
+    def handle_event(self, event):
+        pass
+
+    def handle_command_insert(self, command):
+        pass
+
+    def handle_command_update(self, command):
         pass
 
     def handle_notification(self, notification):

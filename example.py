@@ -32,8 +32,8 @@ access_token = 'PLUGIN_AUTH_TOKEN'
 
 
 class ExampleHandler(Handler):
-    def handle_notification(self, notification):
-        print(notification.content)
+    def handle_event(self, event):
+        print(event.content)
 
 
 def main():

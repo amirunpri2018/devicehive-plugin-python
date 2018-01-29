@@ -15,14 +15,14 @@
 
 
 from devicehive_plugin.api import Api
-from devicehive_plugin.notification import Notification
+from devicehive_plugin.api_event import ApiEvent
 from devicehive_plugin.error import ResponseMessageError
-
 
 __all__ = ['ApiHandler']
 
 
 class ApiHandler(object):
+
     def __init__(self, transport, credentials, topic_name, handler_class,
                  handler_args, handler_kwargs, api_init=True):
         self._transport = transport
@@ -36,12 +36,22 @@ class ApiHandler(object):
     def handler(self):
         return self._handler
 
-    def handle_event(self, event):
-        if event.is_notification_type:
-            self._handler.handle_notification(
-                Notification(event.payload_message))
-        else:
+    def handle_event(self, message):
+        if not message.is_notification_type:
             raise ResponseMessageError('An unsupported event received')
+
+        event = ApiEvent(message.payload_message)
+
+        # call global event handler at first
+        self._handler.handle_event(event)
+
+        # call action-specific handler
+        if event.is_command_insert_event:
+            self._handler.handle_command_insert(event.data)
+        elif event.is_command_update_event:
+            self._handler.handle_command_update(event.data)
+        elif event.is_notification_event:
+            self._handler.handle_notification(event.data)
 
     def handle_connect(self):
         self._api.authenticate()

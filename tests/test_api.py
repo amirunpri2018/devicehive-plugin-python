@@ -29,8 +29,7 @@ def test_create_plugin(test):
 
     assert isinstance(topic_name, six.string_types)
 
-    # TODO: uncomment after "plugin/delete" will be fixed
-    # plugin_api.remove_plugin(topic_name)
+    plugin_api.remove_plugin(topic_name)
 
 
 def test_update_plugin(test):
@@ -44,15 +43,13 @@ def test_update_plugin(test):
     name = test.generate_id('u-p')
     description = '%s-description' % name
     parameters = {'parameters-key': 'parameters-value'}
-    # TODO: uncomment after "plugin/update" will be fixed
-    # plugin = plugin_api.update_plugin(topic_name, name, description, parameters)
+    plugin = plugin_api.update_plugin(topic_name, name, description, parameters)
 
     assert plugin['name'] == name
     assert plugin['description'] == description
     assert plugin['parameters'] == parameters
 
-    # TODO: uncomment after "plugin/delete" will be fixed
-    # plugin_api.remove_plugin(topic_name)
+    plugin_api.remove_plugin(topic_name)
     try:
         plugin_api.update_plugin(topic_name, name)
         assert False
@@ -71,16 +68,15 @@ def test_remove_plugin(test):
 
     topic_name = plugin['topicName']
 
-    # TODO: uncomment after "plugin/delete" will be fixed
-    # plugin_api.remove_plugin(topic_name)
-    # try:
-    #     plugin_api.remove_plugin(topic_name)
-    #     assert False
-    # except PluginApiError as plugin_api_error:
-    #     if test.is_user_admin:
-    #         assert plugin_api_error.code == 404
-    #     else:
-    #         assert plugin_api_error.code == 403
+    plugin_api.remove_plugin(topic_name)
+    try:
+        plugin_api.remove_plugin(topic_name)
+        assert False
+    except PluginApiError as plugin_api_error:
+        if test.is_user_admin:
+            assert plugin_api_error.code == 404
+        else:
+            assert plugin_api_error.code == 403
 
 
 def test_list_plugin(test):
