@@ -27,6 +27,7 @@ logger = logging.getLogger(__name__)
 
 
 class Plugin(object):
+
     def __init__(self, handler_class, *handler_args, **handler_kwargs):
         self._api_handler_options = {'handler_class': handler_class,
                                      'handler_args': handler_args,

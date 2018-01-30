@@ -51,8 +51,8 @@ def test_subscribe_events(test):
                                      notification_id]
 
     def handle_event(handler, event):
-        assert event.content.id in handler.data['event_ids']
-        handler.data['event_ids'].remove(event.content.id)
+        assert event.data.id in handler.data['event_ids']
+        handler.data['event_ids'].remove(event.data.id)
         if handler.data['event_ids']:
             return
         handler.data['device'].remove()

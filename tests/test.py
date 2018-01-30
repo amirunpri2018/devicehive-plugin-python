@@ -31,7 +31,6 @@ if six.PY2:
 
 
 class TestHandler(Handler):
-    """Test handler class."""
 
     def __init__(self, api, handle_connect, handle_event, handle_command_insert,
                  handle_command_update, handle_notification, data):
@@ -70,7 +69,6 @@ class TestHandler(Handler):
 
 
 class Test(object):
-    """Test class."""
 
     # entity types
     USER_ENTITY = 'user'

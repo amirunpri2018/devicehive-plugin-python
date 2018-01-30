@@ -15,7 +15,6 @@
 
 
 class Token(object):
-    """Token class."""
 
     AUTH_HEADER_NAME = 'Authorization'
     AUTH_HEADER_VALUE_PREFIX = 'Bearer '
@@ -71,4 +70,4 @@ class Token(object):
 
 
 class TokenError(IOError):
-    """Token error."""
+    pass

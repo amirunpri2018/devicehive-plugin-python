@@ -23,6 +23,7 @@ __all__ = ['ApiEvent']
 
 
 class ApiEvent(object):
+
     DATA_KEY = 'b'
     ACTION_KEY = 'a'
     COMMAND_KEY = 'command'

@@ -21,6 +21,7 @@ __all__ = ['Api']
 
 
 class Api(object):
+
     def __init__(self, transport, credentials, topic_name):
         self._transport = transport
         self._token = Token(self, credentials, topic_name)

@@ -27,18 +27,19 @@ logger.setLevel('DEBUG')
 
 
 url = 'ws://playground-dev.devicehive.com/plugin/proxy/'
-topic = 'PLUGIN_TOPIC_NAME'
-access_token = 'PLUGIN_AUTH_TOKEN'
+topic_name = 'PLUGIN_TOPIC_NAME'
+plugin_access_token = 'PLUGIN_ACCESS_TOKEN'
 
 
-class ExampleHandler(Handler):
+class SimpleHandler(Handler):
+
     def handle_event(self, event):
-        print(event.content)
+        print(event.data)
 
 
 def main():
-    p = Plugin(ExampleHandler)
-    p.connect(url, topic, access_token=access_token)
+    p = Plugin(SimpleHandler)
+    p.connect(url, topic_name, plugin_access_token=plugin_access_token)
 
 
 if __name__ == '__main__':

@@ -15,21 +15,18 @@
 
 
 class TransportError(IOError):
-    """TransportError error."""
     pass
 
 
 class ResponseMessageError(TransportError):
-    """ResponseMessageError error."""
     pass
 
 
 class TokenError(TransportError):
-    """PluginTokenError error."""
+    pass
 
 
 class AuthApiError(TokenError):
-    """PluginTokenError error."""
 
     def __init__(self, code, message):
         self.code = code

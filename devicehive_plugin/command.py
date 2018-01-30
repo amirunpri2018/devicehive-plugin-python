@@ -15,7 +15,6 @@
 
 
 class Command(object):
-    """Command class."""
 
     DEVICE_ID_KEY = 'deviceId'
     ID_KEY = 'id'

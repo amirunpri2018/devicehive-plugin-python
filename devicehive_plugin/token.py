@@ -22,6 +22,7 @@ from devicehive_plugin.message import RequestMessage
 
 
 class Token(object):
+
     AUTH_HEADER_NAME = 'Authorization'
     AUTH_HEADER_PREFIX = 'Bearer '
     SUCCESS_CODES = [200, 201, 204]

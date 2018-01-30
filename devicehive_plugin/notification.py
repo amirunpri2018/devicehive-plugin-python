@@ -15,7 +15,6 @@
 
 
 class Notification(object):
-    """Notification class."""
 
     DEVICE_ID_KEY = 'deviceId'
     ID_KEY = 'id'
