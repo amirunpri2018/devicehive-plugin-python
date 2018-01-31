@@ -14,6 +14,7 @@
 # =============================================================================
 
 
+import json
 import logging
 import requests
 
@@ -43,9 +44,12 @@ class PluginApi(object):
                      method, url, params, data)
         response = requests.request(method, url, params=params, json=data,
                                     headers=headers)
-        content = response.json()
+        content = response.content
         logger.debug('Response: code=%s content=%s', response.status_code,
                      response.content)
+        if content:
+            content = json.loads(content)
+
         if response.status_code in self.SUCCESS_CODES:
             return content
 
@@ -99,8 +103,6 @@ class PluginApi(object):
                       subscribe_update_commands=None,
                       subscribe_notifications=None):
 
-        # parameters = parameters if parameters is not None else {}
-
         method = 'PUT'
         url = 'plugin'
         params = {
@@ -111,7 +113,7 @@ class PluginApi(object):
         if description is not None:
             params['description'] = description
         if parameters is not None:
-            params['parameters'] = parameters
+            params['parameters'] = json.dumps(parameters)
         if device_id is not None:
             params['deviceId'] = device_id
         if device_type_ids is not None:

@@ -43,7 +43,9 @@ def test_update_plugin(test):
     name = test.generate_id('u-p')
     description = '%s-description' % name
     parameters = {'parameters-key': 'parameters-value'}
-    plugin = plugin_api.update_plugin(topic_name, name, description, parameters)
+    plugin_api.update_plugin(topic_name, name, description, parameters)
+
+    plugin, = plugin_api.list_plugins(topic_name=topic_name)
 
     assert plugin['name'] == name
     assert plugin['description'] == description
