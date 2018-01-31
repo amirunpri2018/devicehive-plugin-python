@@ -38,6 +38,9 @@ class PluginApi(object):
         self._url = url
         self._token = Token(self, credentials)
 
+    def auth(self):
+        self._token.auth()
+
     def request(self, method, url, params=None, data=None, headers=None):
         url = self._url + url
         logger.debug('Request: method=%s url=%s params=%s data=%s',

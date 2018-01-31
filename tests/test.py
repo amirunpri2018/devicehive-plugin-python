@@ -181,7 +181,9 @@ class Test(object):
         return DeviceHiveApi(self._transport_url, **self._credentials)
 
     def plugin_api(self):
-        return PluginApi(self._transport_url, **self._credentials)
+        api = PluginApi(self._transport_url, **self._credentials)
+        api.auth()
+        return api
 
     def run(self, proxy_endpoint, topic_name, handle_connect,
             handle_event=None, handle_command_insert=None,
