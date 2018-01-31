@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/devicehive/devicehive-plugin-python.svg?branch=master)](https://travis-ci.org/devicehive/devicehive-plugin-python)
+
 # Devicehive plugin
 This library provides wrapper for DeviceHive plugin API
 
