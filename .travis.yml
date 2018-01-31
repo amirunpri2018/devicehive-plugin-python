@@ -1,0 +1,19 @@
+language: python
+python:
+    - pypy
+    - 2.7
+    - 3.5
+    - 3.6
+env: SYNTAX=true
+install:
+    - pip install -r requirements.txt
+    - pip install -r test_requirements.txt
+before_install:
+    - export DEVICE_HIVE_TRANSPORT_URL='http://playground-dev.devicehive.com/api/rest'
+    - openssl aes-256-cbc -K $encrypted_d0bb1d48c50b_key -iv $encrypted_d0bb1d48c50b_iv -in credentials.tar.enc -out credentials.tar -d
+    - tar xvf credentials.tar
+    - export DEVICE_HIVE_ADMIN_LOGIN=$(cat admin_login.txt)
+    - export DEVICE_HIVE_ADMIN_PASSWORD=$(cat admin_password.txt)
+    - export DEVICE_HIVE_CLIENT_LOGIN=$(cat client_login.txt)
+    - export DEVICE_HIVE_CLIENT_PASSWORD=$(cat client_password.txt)
+script: pytest -xv tests --transport-url=$DEVICE_HIVE_TRANSPORT_URL --admin-login=$DEVICE_HIVE_ADMIN_LOGIN --admin-password=$DEVICE_HIVE_ADMIN_PASSWORD --client-login=$DEVICE_HIVE_CLIENT_LOGIN --client-password=$DEVICE_HIVE_CLIENT_PASSWORD
