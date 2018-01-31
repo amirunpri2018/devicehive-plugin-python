@@ -47,16 +47,17 @@ class PluginApi(object):
                      method, url, params, data)
         response = requests.request(method, url, params=params, json=data,
                                     headers=headers)
-        content = response.content
-        logger.debug('Response: code=%s content=%s', response.status_code,
-                     response.content)
+        code = response.status_code
+        content = response.text
+        logger.debug('Response: code=%s content=%s', code, content)
+
         if content:
             content = json.loads(content)
 
-        if response.status_code in self.SUCCESS_CODES:
+        if code in self.SUCCESS_CODES:
             return content
 
-        raise PluginApiError(response.status_code, content['message'])
+        raise PluginApiError(code, content['message'])
 
     def auth_request(self, method, url, params=None, data=None, headers=None):
         if headers is None:
