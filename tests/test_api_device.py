@@ -17,10 +17,6 @@
 from six.moves import range
 
 
-# TODO: remove this after server response will be fixed
-proxy_endpoint = 'ws://playground-dev.devicehive.com/plugin/proxy/'
-
-
 def test_subscribe_events(test):
     plugin_api = test.plugin_api()
     device_hive_api = test.device_hive_api()
@@ -67,6 +63,7 @@ def test_subscribe_events(test):
                                       subscribe_update_commands=True,
                                       subscribe_notifications=True)
     topic_name = plugin['topicName']
+    proxy_endpoint = plugin['proxyEndpoint']
     test.run(proxy_endpoint, topic_name, handle_connect, handle_event,
              data=data)
     plugin_api.remove_plugin(topic_name)
@@ -88,6 +85,7 @@ def test_subscribe_events(test):
                                       subscribe_update_commands=True,
                                       subscribe_notifications=False)
     topic_name = plugin['topicName']
+    proxy_endpoint = plugin['proxyEndpoint']
     test.run(proxy_endpoint, topic_name, handle_connect, handle_event,
              data=data)
     plugin_api.remove_plugin(topic_name)
@@ -109,6 +107,7 @@ def test_subscribe_events(test):
                                       subscribe_update_commands=False,
                                       subscribe_notifications=True)
     topic_name = plugin['topicName']
+    proxy_endpoint = plugin['proxyEndpoint']
     test.run(proxy_endpoint, topic_name, handle_connect, handle_event,
              data=data)
     plugin_api.remove_plugin(topic_name)
@@ -146,6 +145,7 @@ def test_subscribe_insert_commands(test):
     plugin = plugin_api.create_plugin(name, description,
                                       device_id=data['device'].id)
     topic_name = plugin['topicName']
+    proxy_endpoint = plugin['proxyEndpoint']
     test.run(proxy_endpoint, topic_name, handle_connect,
              handle_command_insert=handle_command_insert, data=data)
     plugin_api.remove_plugin(topic_name)
@@ -158,6 +158,7 @@ def test_subscribe_insert_commands(test):
                                       device_id=data['device'].id,
                                       names=data['command_names'][:1])
     topic_name = plugin['topicName']
+    proxy_endpoint = plugin['proxyEndpoint']
     test.run(proxy_endpoint, topic_name, handle_connect,
              handle_command_insert=handle_command_insert, data=data)
     plugin_api.remove_plugin(topic_name)
@@ -205,6 +206,7 @@ def test_subscribe_update_commands(test):
                                       subscribe_insert_commands=False,
                                       subscribe_update_commands=True)
     topic_name = plugin['topicName']
+    proxy_endpoint = plugin['proxyEndpoint']
     test.run(proxy_endpoint, topic_name, handle_connect,
              handle_command_update=handle_command_update, data=data)
     plugin_api.remove_plugin(topic_name)
@@ -219,6 +221,7 @@ def test_subscribe_update_commands(test):
                                       subscribe_insert_commands=False,
                                       subscribe_update_commands=True)
     topic_name = plugin['topicName']
+    proxy_endpoint = plugin['proxyEndpoint']
     test.run(proxy_endpoint, topic_name, handle_connect,
              handle_command_update=handle_command_update, data=data)
     plugin_api.remove_plugin(topic_name)
@@ -259,6 +262,7 @@ def test_subscribe_insert_notifications(test):
                                       subscribe_insert_commands=False,
                                       subscribe_notifications=True)
     topic_name = plugin['topicName']
+    proxy_endpoint = plugin['proxyEndpoint']
     test.run(proxy_endpoint, topic_name, handle_connect,
              handle_notification=handle_notification, data=data)
     plugin_api.remove_plugin(topic_name)
@@ -273,6 +277,7 @@ def test_subscribe_insert_notifications(test):
                                       subscribe_insert_commands=False,
                                       subscribe_notifications=True)
     topic_name = plugin['topicName']
+    proxy_endpoint = plugin['proxyEndpoint']
     test.run(proxy_endpoint, topic_name, handle_connect,
              handle_notification=handle_notification, data=data)
     plugin_api.remove_plugin(topic_name)
