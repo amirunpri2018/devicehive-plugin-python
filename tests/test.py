@@ -44,7 +44,7 @@ class TestHandler(Handler):
 
     def handle_connect(self):
         self._handle_connect(self)
-        if not self._handle_notification:
+        if not self._handle_connect:
             self.disconnect()
 
     def handle_event(self, event):
@@ -57,7 +57,7 @@ class TestHandler(Handler):
             return
         self._handle_command_insert(self, command)
 
-    def _handle_command_update(self, command):
+    def handle_command_update(self, command):
         if not self._handle_command_update:
             return
         self._handle_command_update(self, command)
@@ -174,7 +174,7 @@ class Test(object):
         pytest.skip('Implemented only for "admin" user role.')
 
     def _on_handle_timeout(self, plugin):
-        plugin.handler.api.disconnect()
+        plugin.handler.disconnect()
         self._is_handle_timeout = True
 
     def device_hive_api(self):

@@ -86,9 +86,9 @@ class PluginApi(object):
         url = 'plugin'
         params = {
             'deviceId': device_id,
-            'deviceTypeIds': device_type_ids,
-            'networkIds': network_ids,
-            'names': names,
+            'deviceTypeIds': ','.join(map(str, device_type_ids)),
+            'networkIds': ','.join(map(str, network_ids)),
+            'names': ','.join(map(str, names)),
             'returnCommands': subscribe_insert_commands,
             'returnUpdatedCommands': subscribe_update_commands,
             'returnNotifications': subscribe_notifications,
@@ -121,11 +121,11 @@ class PluginApi(object):
         if device_id is not None:
             params['deviceId'] = device_id
         if device_type_ids is not None:
-            params['deviceTypeIds'] = device_type_ids
+            params['deviceTypeIds'] = ','.join(map(str, device_type_ids))
         if network_ids is not None:
-            params['networkIds'] = network_ids
+            params['networkIds'] = ','.join(map(str, network_ids))
         if names is not None:
-            params['names'] = names
+            params['names'] = ','.join(map(str, names))
         if subscribe_insert_commands is not None:
             params['returnCommands'] = subscribe_insert_commands
         if subscribe_update_commands is not None:

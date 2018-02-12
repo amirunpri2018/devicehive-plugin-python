@@ -44,6 +44,7 @@ class Transport(object):
     def __init__(self, api_handler_options):
         self._connected = False
         self._websocket = websocket.WebSocket()
+        self._event_queue_sleep_time = None
         self._response_sleep_time = None
         self._exception_info = None
         self._event_queue = queue.Queue()
@@ -98,9 +99,11 @@ class Transport(object):
     def _connect(self, url, **options):
         logger.debug('Connecting to %s', url)
         timeout = options.pop('timeout', None)
+        event_queue_sleep_time = options.pop('event_queue_sleep_time', 1e-6)
         response_sleep_time = options.pop('response_sleep_time', 1e-6)
         pong_timeout = options.pop('pong_timeout', None)
         self._websocket.timeout = timeout
+        self._event_queue_sleep_time = event_queue_sleep_time
         self._response_sleep_time = response_sleep_time
         _websocket_call(self._websocket.connect, url, **options)
         self._connected = True
@@ -119,7 +122,11 @@ class Transport(object):
         logger.debug('Successfully connected')
 
     def _receive(self):
-        while self._connected:
+        while self._connected and not self._exception_info:
+            if self._event_queue.empty():
+                time.sleep(self._event_queue_sleep_time)
+                continue
+
             event = self._event_queue.get()
             try:
                 self._handle_event(event)

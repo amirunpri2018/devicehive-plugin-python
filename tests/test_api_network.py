@@ -167,12 +167,16 @@ def test_subscribe_insert_commands(test):
     plugin_api.remove_plugin(topic_name)
 
     # =========================================================================
+    def handle_connect(handler):
+        handler.data['command_ids'] = send_data(
+            handler.data['device'], handler.data['command_names'])[-1:]
+
     data = init_data()
     name = test.generate_id('n-s-i-c', test.PLUGIN_ENTITY)
     description = '%s-description' % name
     plugin = plugin_api.create_plugin(name, description,
                                       network_ids=[data['network'].id],
-                                      names=data['command_names'][:1])
+                                      names=data['command_names'][-1:])
     topic_name = plugin['topicName']
     proxy_endpoint = plugin['proxyEndpoint']
     test.run(proxy_endpoint, topic_name, handle_connect,
@@ -236,12 +240,15 @@ def test_subscribe_update_commands(test):
     plugin_api.remove_plugin(topic_name)
 
     # =========================================================================
+    def handle_connect(handler):
+        handler.data['command_ids'] = send_data(
+            handler.data['device'], handler.data['command_names'])[-1:]
     data = init_data()
     name = test.generate_id('n-s-u-c', test.PLUGIN_ENTITY)
     description = '%s-description' % name
     plugin = plugin_api.create_plugin(name, description,
                                       network_ids=[data['network'].id],
-                                      names=data['command_names'][:1],
+                                      names=data['command_names'][-1:],
                                       subscribe_insert_commands=False,
                                       subscribe_update_commands=True)
     topic_name = plugin['topicName']
@@ -275,8 +282,8 @@ def test_subscribe_notifications(test):
                 notification_names]
 
     def handle_connect(handler):
-        handler.data['notification_ids'] = send_data(handler.data['device'],
-                                                handler.data['notification_names'])
+        handler.data['notification_ids'] = send_data(
+            handler.data['device'], handler.data['notification_names'])
 
     def handle_notification(handler, notification):
         assert notification.id in handler.data['notification_ids']
@@ -298,12 +305,16 @@ def test_subscribe_notifications(test):
     plugin_api.remove_plugin(topic_name)
 
     # =========================================================================
+    def handle_connect(handler):
+        handler.data['notification_ids'] = send_data(
+            handler.data['device'], handler.data['notification_names'])[-1:]
+
     data = init_data()
     name = test.generate_id('n-s-n', test.PLUGIN_ENTITY)
     description = '%s-description' % name
     plugin = plugin_api.create_plugin(name, description,
                                       network_ids=[data['network'].id],
-                                      names=data['notification_names'][:1])
+                                      names=data['notification_names'][-1:])
     topic_name = plugin['topicName']
     proxy_endpoint = plugin['proxyEndpoint']
     test.run(proxy_endpoint, topic_name, handle_connect,
