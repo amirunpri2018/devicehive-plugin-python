@@ -43,7 +43,9 @@ class Transport(object):
 
     def __init__(self, api_handler_options):
         self._connected = False
+        self._connection_lock = threading.Lock()
         self._websocket = websocket.WebSocket()
+        self._connection_thread = None
         self._event_queue_sleep_time = None
         self._response_sleep_time = None
         self._exception_info = None
@@ -135,7 +137,8 @@ class Transport(object):
 
     def _disconnect(self):
         logger.debug('Disconnecting')
-        _websocket_call(self._websocket.close)
+        with self._connection_lock:
+            _websocket_call(self._websocket.close)
         self._pong_received = False
         self._responses = {}
         self._handle_disconnect()
@@ -152,7 +155,8 @@ class Transport(object):
 
     def _event(self):
         while self._connected:
-            opcode, data = _websocket_call(self._websocket.recv_data, True)
+            with self._connection_lock:
+                opcode, data = _websocket_call(self._websocket.recv_data, True)
             if opcode in (websocket.ABNF.OPCODE_TEXT,
                           websocket.ABNF.OPCODE_BINARY):
                 if opcode == websocket.ABNF.OPCODE_TEXT:

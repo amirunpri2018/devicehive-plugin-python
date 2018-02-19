@@ -77,8 +77,8 @@ class PluginApi(object):
     def create_plugin(self, name, description, parameters=None, device_id=None,
                       device_type_ids=(), network_ids=(), names=(),
                       subscribe_insert_commands=True,
-                      subscribe_update_commands=False,
-                      subscribe_notifications=False):
+                      subscribe_update_commands=True,
+                      subscribe_notifications=True):
 
         parameters = parameters if parameters is not None else {}
 

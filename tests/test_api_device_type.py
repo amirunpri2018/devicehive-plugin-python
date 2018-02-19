@@ -18,6 +18,8 @@ from six.moves import range
 
 
 def test_subscribe_events(test):
+    test.only_admin_implementation()
+
     plugin_api = test.plugin_api()
     device_hive_api = test.device_hive_api()
 
@@ -65,10 +67,7 @@ def test_subscribe_events(test):
     description = '%s-description' % name
     plugin = plugin_api.create_plugin(name, description,
                                       device_id=data['device'].id,
-                                      device_type_ids=[data['device_type'].id],
-                                      subscribe_insert_commands=True,
-                                      subscribe_update_commands=True,
-                                      subscribe_notifications=True)
+                                      device_type_ids=[data['device_type'].id])
     topic_name = plugin['topicName']
     proxy_endpoint = plugin['proxyEndpoint']
     test.run(proxy_endpoint, topic_name, handle_connect, handle_event,
@@ -89,8 +88,6 @@ def test_subscribe_events(test):
     plugin = plugin_api.create_plugin(name, description,
                                       device_id=data['device'].id,
                                       device_type_ids=[data['device_type'].id],
-                                      subscribe_insert_commands=True,
-                                      subscribe_update_commands=True,
                                       subscribe_notifications=False)
     topic_name = plugin['topicName']
     proxy_endpoint = plugin['proxyEndpoint']
@@ -112,9 +109,7 @@ def test_subscribe_events(test):
     plugin = plugin_api.create_plugin(name, description,
                                       device_id=data['device'].id,
                                       device_type_ids=[data['device_type'].id],
-                                      subscribe_insert_commands=True,
-                                      subscribe_update_commands=False,
-                                      subscribe_notifications=True)
+                                      subscribe_update_commands=False)
     topic_name = plugin['topicName']
     proxy_endpoint = plugin['proxyEndpoint']
     test.run(proxy_endpoint, topic_name, handle_connect, handle_event,
@@ -162,7 +157,9 @@ def test_subscribe_insert_commands(test):
     name = test.generate_id('dt-s-i-c')
     description = '%s-description' % name
     plugin = plugin_api.create_plugin(name, description,
-                                      device_type_ids=[data['device_type'].id])
+                                      device_type_ids=[data['device_type'].id],
+                                      subscribe_update_commands=False,
+                                      subscribe_notifications=False)
     topic_name = plugin['topicName']
     proxy_endpoint = plugin['proxyEndpoint']
     test.run(proxy_endpoint, topic_name, handle_connect,
@@ -179,7 +176,9 @@ def test_subscribe_insert_commands(test):
     description = '%s-description' % name
     plugin = plugin_api.create_plugin(name, description,
                                       device_type_ids=[data['device_type'].id],
-                                      names=data['command_names'][-1:])
+                                      names=data['command_names'][-1:],
+                                      subscribe_update_commands=False,
+                                      subscribe_notifications=False)
     topic_name = plugin['topicName']
     proxy_endpoint = plugin['proxyEndpoint']
     test.run(proxy_endpoint, topic_name, handle_connect,
@@ -237,7 +236,7 @@ def test_subscribe_update_commands(test):
     plugin = plugin_api.create_plugin(name, description,
                                       device_type_ids=[data['device_type'].id],
                                       subscribe_insert_commands=False,
-                                      subscribe_update_commands=True)
+                                      subscribe_notifications=False)
     topic_name = plugin['topicName']
     proxy_endpoint = plugin['proxyEndpoint']
     test.run(proxy_endpoint, topic_name, handle_connect,
@@ -256,7 +255,7 @@ def test_subscribe_update_commands(test):
                                       device_type_ids=[data['device_type'].id],
                                       names=data['command_names'][-1:],
                                       subscribe_insert_commands=False,
-                                      subscribe_update_commands=True)
+                                      subscribe_notifications=False)
     topic_name = plugin['topicName']
     proxy_endpoint = plugin['proxyEndpoint']
     test.run(proxy_endpoint, topic_name, handle_connect,
@@ -307,7 +306,7 @@ def test_subscribe_notifications(test):
     plugin = plugin_api.create_plugin(name, description,
                                       device_type_ids=[data['device_type'].id],
                                       subscribe_insert_commands=False,
-                                      subscribe_notifications=True)
+                                      subscribe_update_commands=False)
     topic_name = plugin['topicName']
     proxy_endpoint = plugin['proxyEndpoint']
     test.run(proxy_endpoint, topic_name, handle_connect,
@@ -326,7 +325,7 @@ def test_subscribe_notifications(test):
                                       device_type_ids=[data['device_type'].id],
                                       names=data['notification_names'][-1:],
                                       subscribe_insert_commands=False,
-                                      subscribe_notifications=True)
+                                      subscribe_update_commands=False)
     topic_name = plugin['topicName']
     proxy_endpoint = plugin['proxyEndpoint']
     test.run(proxy_endpoint, topic_name, handle_connect,
