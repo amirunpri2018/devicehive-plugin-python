@@ -43,12 +43,14 @@ def test_subscribe_events(test):
                               handler.data['command_name'],
                               handler.data['notification_name'])
         command_insert_id, command_update_id, notification_id = event_ids
-        handler.data['event_ids'] = [command_insert_id, command_update_id,
-                                     notification_id]
+        handler.data['event_ids'] = [('command/insert', command_insert_id),
+                                     ('command/update', command_update_id),
+                                     ('notification/insert', notification_id)]
 
     def handle_event(handler, event):
-        assert event.data.id in handler.data['event_ids']
-        handler.data['event_ids'].remove(event.data.id)
+        action_id_pair = (event.action, event.data.id)
+        assert action_id_pair in handler.data['event_ids']
+        handler.data['event_ids'].remove(action_id_pair)
         if handler.data['event_ids']:
             return
         handler.data['device'].remove()
@@ -71,7 +73,8 @@ def test_subscribe_events(test):
                               handler.data['command_name'],
                               handler.data['notification_name'])
         command_insert_id, command_update_id, notification_id = event_ids
-        handler.data['event_ids'] = [command_insert_id, command_update_id]
+        handler.data['event_ids'] = [('command/insert', command_insert_id),
+                                     ('command/update', command_update_id)]
 
     data = init_data()
     name = test.generate_id('d-s-e', test.PLUGIN_ENTITY)
@@ -91,7 +94,8 @@ def test_subscribe_events(test):
                               handler.data['command_name'],
                               handler.data['notification_name'])
         command_insert_id, command_update_id, notification_id = event_ids
-        handler.data['event_ids'] = [command_insert_id, notification_id]
+        handler.data['event_ids'] = [('command/insert', command_insert_id),
+                                     ('notification/insert', notification_id)]
 
     data = init_data()
     name = test.generate_id('d-s-e', test.PLUGIN_ENTITY)
@@ -99,6 +103,27 @@ def test_subscribe_events(test):
     plugin = plugin_api.create_plugin(name, description,
                                       device_id=data['device'].id,
                                       subscribe_update_commands=False)
+    topic_name = plugin['topicName']
+    proxy_endpoint = plugin['proxyEndpoint']
+    test.run(proxy_endpoint, topic_name, handle_connect, handle_event,
+             data=data)
+    plugin_api.remove_plugin(topic_name)
+
+    # =========================================================================
+    def handle_connect(handler):
+        event_ids = send_data(handler.data['device'],
+                              handler.data['command_name'],
+                              handler.data['notification_name'])
+        command_insert_id, command_update_id, notification_id = event_ids
+        handler.data['event_ids'] = [('command/update', command_update_id),
+                                     ('notification/insert', notification_id)]
+
+    data = init_data()
+    name = test.generate_id('d-s-e', test.PLUGIN_ENTITY)
+    description = '%s-description' % name
+    plugin = plugin_api.create_plugin(name, description,
+                                      device_id=data['device'].id,
+                                      subscribe_insert_commands=False)
     topic_name = plugin['topicName']
     proxy_endpoint = plugin['proxyEndpoint']
     test.run(proxy_endpoint, topic_name, handle_connect, handle_event,
@@ -232,7 +257,7 @@ def test_subscribe_update_commands(test):
     plugin_api.remove_plugin(topic_name)
 
 
-def test_subscribe_insert_notifications(test):
+def test_subscribe_notifications(test):
     plugin_api = test.plugin_api()
     device_hive_api = test.device_hive_api()
 

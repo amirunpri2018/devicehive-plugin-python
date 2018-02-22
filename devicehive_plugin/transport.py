@@ -137,6 +137,7 @@ class Transport(object):
 
     def _disconnect(self):
         logger.debug('Disconnecting')
+        _websocket_call(self._websocket.ping)
         with self._connection_lock:
             _websocket_call(self._websocket.close)
         self._pong_received = False
