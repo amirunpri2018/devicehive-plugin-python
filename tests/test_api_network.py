@@ -29,7 +29,7 @@ def test_subscribe_events(test):
         network = device_hive_api.create_network(net_name, net_description)
 
         device_id = test.generate_id('n-s-e', test.DEVICE_ENTITY)
-        device = device_hive_api.put_device(device_id)
+        device = device_hive_api.put_device(device_id, network_id=network.id)
         command_name = '%s-command' % device_id
         notification_name = '%s-notification' % device_id
 

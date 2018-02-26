@@ -30,7 +30,8 @@ def test_subscribe_events(test):
                                                          dt_description)
 
         device_id = test.generate_id('dt-s-e', test.DEVICE_ENTITY)
-        device = device_hive_api.put_device(device_id)
+        device = device_hive_api.put_device(device_id,
+                                            device_type_id=device_type.id)
         command_name = '%s-command' % device_id
         notification_name = '%s-notification' % device_id
 
