@@ -15,6 +15,7 @@
 
 
 import six
+import time
 
 from tests.devicehive_plugin_api.api import PluginApiError
 
@@ -85,6 +86,9 @@ def test_update_plugin(test):
         handler.disconnect()
 
     test.run(proxy_endpoint, topic_name, handle_connect)
+
+    # Race-condition on server side
+    time.sleep(0.1)
 
     name = test.generate_id('u-p', test.PLUGIN_ENTITY)
     description = '%s-description' % name

@@ -1,4 +1,5 @@
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square)](LICENSE) [![Build Status](https://travis-ci.org/devicehive/devicehive-plugin-python.svg?branch=master)](https://travis-ci.org/devicehive/devicehive-plugin-python)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE) 
+[![Build Status](https://travis-ci.org/devicehive/devicehive-plugin-python.svg?branch=master)](https://travis-ci.org/devicehive/devicehive-plugin-python)
 
 # Devicehive plugin
 This library provides wrapper for DeviceHive plugin API
@@ -193,3 +194,43 @@ Properties:
 * `notification` (read only)
 * `parameters` (read only)
 * `timestamp` (read only)
+
+## Docker tests
+
+### Build image
+
+```
+docker build -f Dockerfile -t devicehive-plugin-tests .
+```
+
+### Run tests
+
+You can run tests with refresh_token by setting `ADMIN_REFRESH_TOKEN` and/or `CLIENT_REFRESH_TOKEN` variable:
+
+```
+docker run -it -e ADMIN_REFRESH_TOKEN='SOME_ADMIN_REFRESH_TOKEN' devicehive-plugin-tests
+```
+
+Or with access_token by setting `ADMIN_ACCESS_TOKEN` and/or `CLIENT_ACCESS_TOKEN` variable:
+
+```
+docker run -it -e ADMIN_ACCESS_TOKEN='SOME_ADMIN_ACCESS_TOKEN' devicehive-plugin-tests
+```
+
+Or with user login and password by setting `ADMIN_LOGIN` and `ADMIN_PASSWORD` for admin account and/or `CLIENT_LOGIN` and `CLIENT_PASSWORD` for client account.
+
+```
+docker run -it -e ADMIN_LOGIN='SOME_ADMIN_LOGIN' -e ADMIN_PASSWORD='SOME_ADMIN_PASSWORD' devicehive-plugin-tests
+```
+
+To run tests with enabled requests logging you need to change `LOG_LEVEL` variable:
+
+```
+docker run -it -e ADMIN_REFRESH_TOKEN='SOME_ADMIN_REFRESH_TOKEN' -e LOG_LEVEL='DEBUG' devicehive-plugin-tests
+```
+
+To run the specific test you need to set `TEST` variable:
+
+```
+docker run -it -e TEST=test_api.py::test_get_info -e ADMIN_REFRESH_TOKEN='SOME_ADMIN_REFRESH_TOKEN' devicehive-plugin-tests
+```

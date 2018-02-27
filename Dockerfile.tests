@@ -1,0 +1,50 @@
+# Copyright (C) 2018 DataArt
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# =============================================================================
+
+
+FROM python:3.6
+
+WORKDIR /usr/src/app
+
+ENV TEST=''
+ENV TRANSPORT_URL='http://playground-dev.devicehive.com/api/rest'
+ENV ADMIN_REFRESH_TOKEN=''
+ENV CLIENT_REFRESH_TOKEN=''
+ENV ADMIN_ACCESS_TOKEN=''
+ENV CLIENT_ACCESS_TOKEN=''
+ENV ADMIN_LOGIN=''
+ENV ADMIN_PASSWORD=''
+ENV CLIENT_LOGIN=''
+ENV CLIENT_PASSWORD=''
+ENV LOG_LEVEL='INFO'
+
+COPY requirements.txt ./
+COPY test_requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r test_requirements.txt
+
+COPY . .
+
+ENTRYPOINT pytest -vx tests/$TEST\
+            --transport-url=$TRANSPORT_URL\
+            --admin-refresh-token=$ADMIN_REFRESH_TOKEN\
+            --admin-access-token=$ADMIN_ACCESS_TOKEN\
+            --client-refresh-token=$CLIENT_REFRESH_TOKEN\
+            --client-access-token=$CLIENT_ACCESS_TOKEN\
+            --admin-login=$ADMIN_LOGIN\
+            --admin-password=$ADMIN_PASSWORD\
+            --client-login=$CLIENT_LOGIN\
+            --client-password=$CLIENT_PASSWORD\
+            --log-level=$LOG_LEVEL
