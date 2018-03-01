@@ -43,9 +43,11 @@ class TestHandler(Handler):
         self.data = data if data is not None else {}
 
     def handle_connect(self):
-        self._handle_connect(self)
         if not self._handle_connect:
             self.disconnect()
+        # TODO: remove when race-condition on server side will be fixed
+        time.sleep(0.1)
+        self._handle_connect(self)
 
     def handle_event(self, event):
         if not self._handle_event:
@@ -206,3 +208,6 @@ class Test(object):
 
         if self._is_handle_timeout:
             raise TimeoutError('Waited too long for handle.')
+
+        # TODO: remove when race-condition on server side will be fixed
+        time.sleep(0.1)
