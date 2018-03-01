@@ -161,39 +161,39 @@ plugin.connect(url, topic_name, auth_url=auth_url,
 
 ### ApiEvent object
 
-Properties:
+Properties (read only):
 
-* `is_command_insert_event` (read only)
-* `is_command_update_event` (read only)
-* `is_command_event` (read only)
-* `is_notification_event` (read only)
-* `action` (read only)
-* `raw_data` (read only)
-* `data` (read only)
+* `is_command_insert_event`
+* `is_command_update_event`
+* `is_command_event`
+* `is_notification_event`
+* `action`
+* `raw_data`
+* `data`
 
 ### Command object
 
-Properties:
+Properties (read only):
 
-* `id` (read only)
-* `user_id` (read only)
-* `command` (read only)
-* `parameters` (read only)
-* `lifetime` (read only)
-* `timestamp` (read only)
-* `last_updated` (read only)
+* `id`
+* `user_id`
+* `command`
+* `parameters`
+* `lifetime`
+* `timestamp`
+* `last_updated`
 * `status`
 * `result`
 
 ### Notification object
 
-Properties:
+Properties (read only):
 
-* `device_id` (read only)
-* `id` (read only)
-* `notification` (read only)
-* `parameters` (read only)
-* `timestamp` (read only)
+* `device_id`
+* `id`
+* `notification`
+* `parameters`
+* `timestamp`
 
 ## Docker tests
 

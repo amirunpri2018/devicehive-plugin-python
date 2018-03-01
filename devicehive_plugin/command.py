@@ -36,8 +36,8 @@ class Command(object):
         self._lifetime = command[self.LIFETIME_KEY]
         self._timestamp = command[self.TIMESTAMP_KEY]
         self._last_updated = command[self.LAST_UPDATED_KEY]
-        self.status = command[self.STATUS_KEY]
-        self.result = command[self.RESULT_KEY]
+        self._status = command[self.STATUS_KEY]
+        self._result = command[self.RESULT_KEY]
 
     @property
     def device_id(self):
@@ -67,5 +67,14 @@ class Command(object):
     def timestamp(self):
         return self._timestamp
 
+    @property
     def last_updated(self):
         return self._last_updated
+
+    @property
+    def status(self):
+        return self._status
+
+    @property
+    def result(self):
+        return self._result
