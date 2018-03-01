@@ -46,7 +46,7 @@ class TestHandler(Handler):
         if not self._handle_connect:
             self.disconnect()
         # TODO: remove when race-condition on server side will be fixed
-        time.sleep(0.2)
+        time.sleep(1)
         self._handle_connect(self)
 
     def handle_event(self, event):
@@ -210,4 +210,4 @@ class Test(object):
             raise TimeoutError('Waited too long for handle.')
 
         # TODO: remove when race-condition on server side will be fixed
-        time.sleep(0.2)
+        time.sleep(1)
