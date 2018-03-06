@@ -14,6 +14,8 @@
 # =============================================================================
 
 
+import os
+import re
 from setuptools import setup
 
 try:
@@ -23,7 +25,12 @@ except(IOError, ImportError):
     long_description = open('README.md').read()
 
 
-version = __import__('devicehive_plugin').__version__
+def get_version(package):
+    init_py = open(os.path.join(package, '__init__.py')).read()
+    return re.search("__version__ = ['\"]([^'\"]+)['\"]", init_py).group(1)
+
+
+version = get_version('devicehive_plugin')
 
 
 setup(name='devicehive_plugin',
@@ -36,10 +43,11 @@ setup(name='devicehive_plugin',
       long_description=long_description,
       keywords='iot cloud m2m gateway embedded devicehive plugin',
       packages=['devicehive_plugin'],
-      install_requires=['websocket-client>=0.44.0', 'requests>=2.18.1',
-                        'six>=1.10.0'],
+      install_requires=['websocket-client>=0.47.0', 'requests>=2.18.4',
+                        'six>=1.11.0'],
+      python_requires=">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*",
       classifiers=[
-          'Development Status :: 2 - Pre-Alpha',
+          'Development Status :: 5 - Production/Stable',
           'Environment :: Console',
           'Intended Audience :: Developers',
           'Intended Audience :: Information Technology',
