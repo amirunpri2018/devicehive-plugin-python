@@ -18,4 +18,4 @@ from .plugin import Plugin
 from .handler import Handler
 
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
