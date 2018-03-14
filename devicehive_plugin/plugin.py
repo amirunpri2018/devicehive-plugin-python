@@ -49,11 +49,15 @@ class Plugin(object):
         connect_timeout = options.pop('connect_timeout', 30)
         max_num_connect = options.pop('max_num_connect', 10)
         connect_interval = options.pop('connect_interval', 1)
-        credentials = {'login': options.pop('login', None),
-                       'password': options.pop('password', None),
-                       'refresh_token': options.pop('refresh_token', None),
-                       'access_token': options.pop('access_token', None),
-                       'auth_url': options.pop('auth_url', None)}
+        credentials = {
+            'login': options.pop('login', None),
+            'password': options.pop('password', None),
+            'access_token': options.pop('access_token', None),
+            'refresh_token': options.pop('refresh_token', None),
+            'plugin_access_token': options.pop('plugin_access_token', None),
+            'plugin_refresh_token': options.pop('plugin_refresh_token', None),
+            'auth_url': options.pop('auth_url', None)
+        }
         api_init = options.pop('api_init', True)
         self._api_handler_options['credentials'] = credentials
         self._api_handler_options['topic_name'] = topic_name

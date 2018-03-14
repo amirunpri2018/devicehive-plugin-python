@@ -68,7 +68,6 @@ def test_update_plugin(test):
                                       subscribe_notifications=False)
 
     topic_name = plugin['topicName']
-    proxy_endpoint = plugin['proxyEndpoint']
 
     def handle_connect(handler):
         try:
@@ -84,7 +83,7 @@ def test_update_plugin(test):
             assert 'command' in notification_filters
         handler.disconnect()
 
-    test.run(proxy_endpoint, topic_name, handle_connect)
+    # test.run(plugin, handle_connect)
 
     name = test.generate_id('u-p', test.PLUGIN_ENTITY)
     description = '%s-description' % name

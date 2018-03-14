@@ -45,8 +45,6 @@ class TestHandler(Handler):
     def handle_connect(self):
         if not self._handle_connect:
             self.disconnect()
-        # TODO: remove when race-condition on server side will be fixed
-        time.sleep(1)
         self._handle_connect(self)
 
     def handle_event(self, event):
@@ -187,27 +185,26 @@ class Test(object):
         api.auth()
         return api
 
-    def run(self, proxy_endpoint, topic_name, handle_connect,
-            handle_event=None, handle_command_insert=None,
-            handle_command_update=None, handle_notification=None, data=None,
-            handle_timeout=60):
+    def run(self, plugin, handle_connect, handle_event=None,
+            handle_command_insert=None, handle_command_update=None,
+            handle_notification=None, data=None, handle_timeout=60):
+        proxy_endpoint = plugin['proxyEndpoint']
+        topic_name = plugin['topicName']
+        access_token = plugin['accessToken']
         handler_kwargs = {'handle_connect': handle_connect,
                           'handle_event': handle_event,
                           'handle_command_insert': handle_command_insert,
                           'handle_command_update': handle_command_update,
                           'handle_notification': handle_notification,
                           'data': data}
-        plugin = Plugin(TestHandler, **handler_kwargs)
+        test_plugin = Plugin(TestHandler, **handler_kwargs)
         timeout_timer = threading.Timer(handle_timeout, self._on_handle_timeout,
-                                        args=(plugin,))
+                                        args=(test_plugin,))
         timeout_timer.setDaemon(True)
         timeout_timer.start()
-        credentials = dict(self._credentials, auth_url=self._transport_url)
-        plugin.connect(proxy_endpoint, topic_name, **credentials)
+        test_plugin.connect(proxy_endpoint, topic_name,
+                            plugin_access_token=access_token)
         timeout_timer.cancel()
 
         if self._is_handle_timeout:
             raise TimeoutError('Waited too long for handle.')
-
-        # TODO: remove when race-condition on server side will be fixed
-        time.sleep(1)
