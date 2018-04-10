@@ -83,6 +83,7 @@ def test_update_plugin(test):
             assert 'command' in notification_filters
         handler.disconnect()
 
+    # TODO: uncomment when race condition on server side will be fixed
     # test.run(plugin, handle_connect)
 
     name = test.generate_id('u-p', test.PLUGIN_ENTITY)
