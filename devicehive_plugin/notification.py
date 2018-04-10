@@ -23,6 +23,7 @@ class Notification(object):
     TIMESTAMP_KEY = 'timestamp'
 
     def __init__(self, notification):
+        self._raw_data = notification
         self._device_id = notification[self.DEVICE_ID_KEY]
         self._id = notification[self.ID_KEY]
         self._notification = notification[self.NOTIFICATION_KEY]
@@ -48,3 +49,7 @@ class Notification(object):
     @property
     def timestamp(self):
         return self._timestamp
+
+    @property
+    def raw_data(self):
+        return self._raw_data

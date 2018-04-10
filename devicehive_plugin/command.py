@@ -28,6 +28,7 @@ class Command(object):
     RESULT_KEY = 'result'
 
     def __init__(self, command):
+        self._raw_data = command
         self._device_id = command[self.DEVICE_ID_KEY]
         self._id = command[self.ID_KEY]
         self._user_id = command[self.USER_ID_KEY]
@@ -78,3 +79,7 @@ class Command(object):
     @property
     def result(self):
         return self._result
+
+    @property
+    def raw_data(self):
+        return self._raw_data
