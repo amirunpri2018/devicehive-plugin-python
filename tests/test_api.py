@@ -108,9 +108,8 @@ def test_update_plugin(test):
     except PluginApiError as plugin_api_error:
         if test.is_user_admin:
             assert plugin_api_error.code == 404
-        # TODO: uncomment this when api response will be fixed
-        # else:
-        #     assert plugin_api_error.code == 403
+        else:
+            assert plugin_api_error.code == 403
 
 
 def test_remove_plugin(test):
@@ -129,9 +128,8 @@ def test_remove_plugin(test):
     except PluginApiError as plugin_api_error:
         if test.is_user_admin:
             assert plugin_api_error.code == 404
-        # TODO: uncomment this when api response will be fixed
-        # else:
-        #     assert plugin_api_error.code == 403
+        else:
+            assert plugin_api_error.code == 403
 
 
 def test_list_plugin(test):

@@ -14,7 +14,6 @@
 # =============================================================================
 
 
-import threading
 import pytest
 import time
 import six
@@ -77,10 +76,12 @@ class Test(object):
     DEVICE_TYPE_ENTITY = 'device_type'
     PLUGIN_ENTITY = 'plugin'
 
-    def __init__(self, transport_url, user_role, credentials):
+    def __init__(self, transport_url, user_role, credentials,
+                 timeout_sleep_time=1e-6):
         self._transport_url = transport_url
         self._user_role = user_role
         self._credentials = credentials
+        self._timeout_sleep_time = timeout_sleep_time
         self._transport_name = DeviceHive.transport_name(self._transport_url)
         self._entity_ids = defaultdict(list)
         self._is_handle_timeout = False
@@ -198,13 +199,18 @@ class Test(object):
                           'handle_notification': handle_notification,
                           'data': data}
         test_plugin = Plugin(TestHandler, **handler_kwargs)
-        timeout_timer = threading.Timer(handle_timeout, self._on_handle_timeout,
-                                        args=(test_plugin,))
-        timeout_timer.setDaemon(True)
-        timeout_timer.start()
         test_plugin.connect(proxy_endpoint, topic_name,
-                            plugin_access_token=access_token)
-        timeout_timer.cancel()
+                            plugin_access_token=access_token,
+                            transport_keep_alive=False)
+        start_time = time.time()
+        while time.time() - handle_timeout < start_time:
+            exception_info = test_plugin.transport.exception_info
+            if exception_info:
+                six.reraise(*exception_info)
 
-        if self._is_handle_timeout:
-            raise TimeoutError('Waited too long for handle.')
+            if not test_plugin.handler.api.connected:
+                return
+
+            time.sleep(self._timeout_sleep_time)
+
+        raise TimeoutError('Waited too long for handle.')

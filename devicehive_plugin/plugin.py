@@ -38,6 +38,10 @@ class Plugin(object):
     def handler(self):
         return self._transport.api_handler.handler
 
+    @property
+    def transport(self):
+        return self._transport
+
     def _ensure_transport_disconnect(self):
         if self._transport.connected:
             self._transport.disconnect()
