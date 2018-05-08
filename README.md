@@ -78,7 +78,7 @@ class SimpleHandler(Handler):
         print(notification.notification)
 
 
-url = 'ws://playground-dev.devicehive.com/plugin/proxy/'
+url = 'ws://playground.devicehive.com/plugin/proxy/'
 topic_name = 'PLUGIN_TOPIC_NAME'
 plugin_access_token = 'PLUGIN_ACCESS_TOKEN'
 plugin = Plugin(SimpleHandler)
@@ -120,40 +120,40 @@ If you want to use anything but plugin's access token you need to provide `auth_
 Examples:
 
 ```python
-url = 'ws://playground-dev.devicehive.com/plugin/proxy/'
+url = 'ws://playground.devicehive.com/plugin/proxy/'
 topic_name = 'PLUGIN_TOPIC_NAME'
 plugin.connect(url, topic_name,
                plugin_access_token='SOME_PLUGIN_ACCESS_TOKEN')
 ```
 
 ```python
-url = 'ws://playground-dev.devicehive.com/plugin/proxy/'
+url = 'ws://playground.devicehive.com/plugin/proxy/'
 topic_name = 'PLUGIN_TOPIC_NAME'
-auth_url = 'http://playground-dev.devicehive.com/api/rest'
+auth_url = 'http://playground.devicehive.com/api/rest'
 plugin.connect(url, topic_name, auth_url=auth_url,
                plugin_refresh_token='SOME_PLUGIN_REFRESH_TOKEN')
 ```
 
 ```python
-url = 'ws://playground-dev.devicehive.com/plugin/proxy/'
+url = 'ws://playground.devicehive.com/plugin/proxy/'
 topic_name = 'PLUGIN_TOPIC_NAME'
-auth_url = 'http://playground-dev.devicehive.com/api/rest'
+auth_url = 'http://playground.devicehive.com/api/rest'
 plugin.connect(url, topic_name, auth_url=auth_url,
                access_token='SOME_USER_ACCESS_TOKEN')
 ```
 
 ```python
-url = 'ws://playground-dev.devicehive.com/plugin/proxy/'
+url = 'ws://playground.devicehive.com/plugin/proxy/'
 topic_name = 'PLUGIN_TOPIC_NAME'
-auth_url = 'http://playground-dev.devicehive.com/api/rest'
+auth_url = 'http://playground.devicehive.com/api/rest'
 plugin.connect(url, topic_name, auth_url=auth_url,
                refresh_token='SOME_USER_REFRESH_TOKEN')
 ```
 
 ```python
-url = 'ws://playground-dev.devicehive.com/plugin/proxy/'
+url = 'ws://playground.devicehive.com/plugin/proxy/'
 topic_name = 'PLUGIN_TOPIC_NAME'
-auth_url = 'http://playground-dev.devicehive.com/api/rest'
+auth_url = 'http://playground.devicehive.com/api/rest'
 plugin.connect(url, topic_name, auth_url=auth_url,
                login='SOME_USER_LOGIN', password='SOME_USER_PASSWORD')
 ```

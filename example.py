@@ -26,7 +26,7 @@ logger.addHandler(handler)
 logger.setLevel('DEBUG')
 
 
-url = 'ws://playground-dev.devicehive.com/plugin/proxy/'
+url = 'ws://playground.devicehive.com/plugin/proxy/'
 topic_name = 'PLUGIN_TOPIC_NAME'
 plugin_access_token = 'PLUGIN_ACCESS_TOKEN'
 
